@@ -30,7 +30,13 @@ namespace MulTris {
 
 		public Tile tile1;
 
-		public static int WIDTH = 600, HEIGHT = 700;
+		private static int DEFRES = 800;
+		private Point USERES = new Point(DEFRES, DEFRES / 12 * 9);
+
+		public static bool changeRes = false;
+		public static int WIDTH { get; set; } = DEFRES;
+		public static int HEIGHT { get; set; } = DEFRES / 12 * 9;
+
 
 		public Game1() {
 			graphics = new GraphicsDeviceManager(this);
@@ -77,7 +83,6 @@ namespace MulTris {
 			// Create a new SpriteBatch, which can be used to draw textures.
 			this.spriteBatch = new SpriteBatch(GraphicsDevice);
 
-			this.tile1.Load(Content, "T5/TileTXT", new Rectangle(0, 0, 50, 50));
 
 			// TODO: use this.Content to load your game content here
 		}
@@ -118,7 +123,7 @@ namespace MulTris {
 
 			if( this.gamestate == GameState.MENU ) {
 				// RENDER ALL MENU SPRITES
-				this.tile1.Draw(this.spriteBatch);
+				this.Menu.Draw(this.spriteBatch);
 
 			}
 			// Render everything on screen
