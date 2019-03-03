@@ -7,7 +7,7 @@ namespace MulTris {
 	/// <summary>
 	/// This is the main type for your game.
 	/// </summary>
-	public class Game1 : Game {
+	public class Multris : Game {
 
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
@@ -24,24 +24,54 @@ namespace MulTris {
 
 		public GameState gamestate = GameState.MENU;
 
-		public Point ScreenCentre(int W) {
-			return new Point(( GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - W ) / 2, 0);
+		public static Point ScreenCentre(int W, int H) {
+			return new Point(
+				( GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width - W ) / 2,
+				( GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height - H ) / 2
+			);
+		}
+
+		public Point WindowCentre() {
+			return new Rectangle(0, 0, WIDTH, HEIGHT).Center;
 		}
 
 		public Tile tile1;
 
-		private static int DEFRES = 800;
-		private Point USERES = new Point(DEFRES, DEFRES / 12 * 9);
+		private const int DEFRES = 1024;
+		private int[] useRes = new int[2] { DEFRES, DEFRES / 12 * 9 };
+		private bool fullScreen = false;
+		private bool borderLess = true;
 
-		public static bool changeRes = false;
-		public static int WIDTH { get; set; } = DEFRES;
-		public static int HEIGHT { get; set; } = DEFRES / 12 * 9;
+		private bool changeRes = false;
+		public int WIDTH { get { return this.useRes[0]; } set { if( changeRes ) this.useRes[0] = value; } }
+		public int HEIGHT { get { return this.useRes[1]; } set { if( changeRes ) this.useRes[1] = value; } }
+		public bool FULLSCREEN { get { return this.fullScreen; } set { if( changeRes ) this.fullScreen = value; } }
+		public bool BORDERLESS { get { return this.borderLess; } set { if( changeRes ) this.borderLess = value; } }
 
+		public void ChangeGameResolution(int? w, int? h, bool? FS, bool? BL) {
+			this.changeRes = true;
+			this.WIDTH = w ?? this.WIDTH;
+			this.HEIGHT = h ?? this.HEIGHT;
+			this.FULLSCREEN = FS ?? this.FULLSCREEN;
+			this.BORDERLESS = BL ?? this.BORDERLESS;
+			this.changeRes = false;
 
-		public Game1() {
+			// Save game res
+			this.graphics.PreferredBackBufferHeight = HEIGHT;
+			this.graphics.PreferredBackBufferWidth = WIDTH;
+			this.graphics.IsFullScreen = FULLSCREEN;
+			Window.IsBorderless = BORDERLESS;
+			this.graphics.ApplyChanges( );
+		}
+
+		public Menu menu;
+
+		public Multris() {
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
 
+
+			menu = new Menu(this);
 
 			// Show the mouse
 			this.IsMouseVisible = true;
@@ -51,9 +81,10 @@ namespace MulTris {
 			// Setting default resolution settings
 			this.graphics.PreferredBackBufferHeight = HEIGHT;
 			this.graphics.PreferredBackBufferWidth = WIDTH;
-			this.graphics.IsFullScreen = false;
-			Window.Position = ScreenCentre(WIDTH);
-			Window.IsBorderless = true;
+			this.graphics.IsFullScreen = FULLSCREEN;
+			Window.IsBorderless = BORDERLESS;
+			Window.Position = new Point(ScreenCentre(WIDTH, 0).X, 0);
+
 
 
 			// Setting default FPS settings
@@ -85,6 +116,8 @@ namespace MulTris {
 
 
 			// TODO: use this.Content to load your game content here
+			menu.Load(Content);
+
 		}
 
 		/// <summary>
@@ -123,7 +156,7 @@ namespace MulTris {
 
 			if( this.gamestate == GameState.MENU ) {
 				// RENDER ALL MENU SPRITES
-				this.Menu.Draw(this.spriteBatch);
+				this.menu.Draw(this.spriteBatch);
 
 			}
 			// Render everything on screen

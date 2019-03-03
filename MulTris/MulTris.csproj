@@ -45,7 +45,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Menu.cs" />
-    <Compile Include="Game1.cs" />
+    <Compile Include="Multris.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tile.cs" />
