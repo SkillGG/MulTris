@@ -35,12 +35,10 @@ namespace MulTris {
 			return new Rectangle(0, 0, WIDTH, HEIGHT).Center;
 		}
 
-		public Tile tile1;
-
-		private const int DEFRES = 800;
+		private const int DEFRES = 1024;
 		private int[] useRes = new int[2] { DEFRES, DEFRES / 12 * 9 };
 		private bool fullScreen = false;
-		private bool borderLess = false;
+		private bool borderLess = true;
 
 		private bool changeRes = false;
 		public int WIDTH { get { return this.useRes[0]; } set { if( changeRes ) this.useRes[0] = value; } }
@@ -64,18 +62,16 @@ namespace MulTris {
 			this.graphics.ApplyChanges( );
 		}
 
+		private InputState inputs;
+
 		public Menu menu;
 
 		public Multris() {
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
 
-			menu = new Menu(this);
-
 			// Show the mouse
 			this.IsMouseVisible = true;
-
-			tile1 = new Tile(null, Color.White);
 
 			// Setting default resolution settings
 			this.graphics.PreferredBackBufferHeight = HEIGHT;
@@ -102,6 +98,10 @@ namespace MulTris {
 		protected override void Initialize() {
 			// TODO: Add your initialization logic here
 
+			this.inputs = new InputState( );
+
+			this.menu = new Menu(this);
+
 			base.Initialize( );
 		}
 
@@ -113,9 +113,9 @@ namespace MulTris {
 			// Create a new SpriteBatch, which can be used to draw textures.
 			this.spriteBatch = new SpriteBatch(GraphicsDevice);
 
-
 			// TODO: use this.Content to load your game content here
-			menu.Load(Content);
+
+			menu.Load(this.Content);
 
 		}
 
@@ -138,7 +138,11 @@ namespace MulTris {
 
 			// TODO: Add your update logic here
 
+			this.menu.Update(inputs);
+
 			base.Update(gameTime);
+
+			inputs.Update( );
 		}
 
 		/// <summary>

@@ -231,19 +231,20 @@ namespace MulTris {
 			}
 		}
 
-		public void HandleClicks() {
-			//	Mouse position/buttons/scroll...
-			MouseState mouse = Mouse.GetState( );
+		/// <summary>
+		/// Checking for any mouse/keyboard/gamepad input.
+		/// <para>Animating anything.</para>
+		/// </summary>
+		public InputState Update(InputState bef) {
 
-			// TODO: Proper handling mouse presses
+			InputState inputs = new InputState( );
 
-		}
+			if( inputs.StateChangeDown(bef, Keys.A) )
+				Console.WriteLine("Changed state of A");
+				
+			
 
-		public void HandleKeyboard() {
-			// Keyboard info
-			KeyboardState keyboard = Keyboard.GetState( );
-
-			// TODO: Proper handling key presses
+			return inputs;
 
 		}
 
