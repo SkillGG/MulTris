@@ -44,6 +44,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="QuickMaths.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Multris.cs" />
     <Compile Include="Program.cs" />

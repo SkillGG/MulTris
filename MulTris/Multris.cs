@@ -14,12 +14,12 @@ namespace MulTris {
 
 		public enum GameState {
 			MENU,
+			SELECT,
+			OPTIONS,
+			T3,
 			T4,
 			T5,
-			T6,
-			T7,
-			T8,
-			OPTIONS
+			T6
 		}
 
 		public GameState gamestate = GameState.MENU;
@@ -37,10 +37,10 @@ namespace MulTris {
 
 		public Tile tile1;
 
-		private const int DEFRES = 1024;
+		private const int DEFRES = 800;
 		private int[] useRes = new int[2] { DEFRES, DEFRES / 12 * 9 };
 		private bool fullScreen = false;
-		private bool borderLess = true;
+		private bool borderLess = false;
 
 		private bool changeRes = false;
 		public int WIDTH { get { return this.useRes[0]; } set { if( changeRes ) this.useRes[0] = value; } }
@@ -69,7 +69,6 @@ namespace MulTris {
 		public Multris() {
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
-
 
 			menu = new Menu(this);
 

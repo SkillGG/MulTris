@@ -20,10 +20,10 @@ namespace MulTris {
 		/// <para>3 - Exit Button</para>
 		/// </summary>
 		private Rectangle[] menuSprites = new Rectangle[4] {
-			new Rectangle(0, 0, 300, 60),		// Game Logo
-			new Rectangle(0, 180, 240, 100),	// Play Button
-			new Rectangle(0, 70, 240, 100),		// Options Button
-			new Rectangle(0, 290, 240, 100)		// Exit Button
+			new Rectangle(0, 100, 900, 180),	// Game Logo
+			new Rectangle(0, 0, 240, 100),		// Play Button
+			new Rectangle(240, 0, 240, 100),	// Options Button
+			new Rectangle(480, 0, 240, 100)		// Exit Button
 		};
 
 		private bool changeBTNPos = false;
@@ -94,7 +94,7 @@ namespace MulTris {
 		/// It is an Array containing two Rectangles:
 		/// <para>0 - buttonPosition</para>
 		/// <para>1 - buttonSprite</para>
-		/// To change it's position or sprite you have to use <see cref="Menu.setSpritePosFor(int,Rectangle)"/>/<see cref="Menu.setPositionFor(int,Rectangle)"/>
+		/// To change it's position or sprite you have to use <see cref="Menu.setSpritePosFor(int,Rectangle)"/>/<see cref="Menu.setPositionFor(int,Rectangle)"/> with 0 as first parameter.
 		/// </summary>
 		public Rectangle[] GameLogo {
 			get {
@@ -118,7 +118,7 @@ namespace MulTris {
 		/// It is an Array containing two Rectangles:
 		/// <para>0 - buttonPosition</para>
 		/// <para>1 - buttonSprite</para>
-		/// To change it's position or sprite you have to use <see cref="Menu.setSpritePosFor(int,Rectangle)"/>/<see cref="Menu.setPositionFor(int,Rectangle)"/>
+		/// To change it's position or sprite you have to use <see cref="Menu.setSpritePosFor(int,Rectangle)"/>/<see cref="Menu.setPositionFor(int,Rectangle)"/> with 1 as first parameter.
 		/// </summary>
 		public Rectangle[] PlayButton {
 			get {
@@ -142,7 +142,7 @@ namespace MulTris {
 		/// It is an Array containing two Rectangles:
 		/// <para>0 - buttonPosition</para>
 		/// <para>1 - buttonSprite</para>
-		/// To change it's position or sprite you have to use <see cref="Menu.setSpritePosFor(int,Rectangle)"/>/<see cref="Menu.setPositionFor(int,Rectangle)"/>
+		/// To change it's position or sprite you have to use <see cref="Menu.setSpritePosFor(int,Rectangle)"/>/<see cref="Menu.setPositionFor(int,Rectangle)"/> with 2 as first parameter.
 		/// </summary>
 		public Rectangle[] OptButton {
 			get {
@@ -166,7 +166,7 @@ namespace MulTris {
 		/// It is an Array containing two Rectangles:
 		/// <para>0 - buttonPosition</para>
 		/// <para>1 - buttonSprite</para>
-		/// To change it's position or sprite you have to use <see cref="Menu.setSpritePosFor(int,Rectangle)"/>/<see cref="Menu.setPositionFor(int,Rectangle)"/>
+		/// To change it's position or sprite you have to use <see cref="Menu.setSpritePosFor(int,Rectangle)"/>/<see cref="Menu.setPositionFor(int,Rectangle)"/> with 3 as first parameter.
 		/// </summary>
 		public Rectangle[] ExitButton {
 			get {
@@ -187,27 +187,31 @@ namespace MulTris {
 
 		public Menu(Multris g) {
 			this.game = g;
+			int logo_bottom = 50 + ( QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) * GameLogo[1].Height )
+				/ GameLogo[1].Width;
 			this.setPositionFor(0, new Rectangle(
-				( g.WIDTH - GameLogo[1].Width ) / 2,
-				0,
-				GameLogo[1].Width,
-				GameLogo[1].Height
+				( g.WIDTH - QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) ) / 2,
+				50,
+				QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100), // Make sure logo will fit in window!
+																			// Compute Scaled Height:
+				( QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) * GameLogo[1].Height )
+				/ GameLogo[1].Width
 			));
 			this.setPositionFor(1, new Rectangle(
-				( g.WIDTH - GameLogo[1].Width ) / 2,
-				120,
+				( g.WIDTH - PlayButton[1].Width ) / 2,
+				logo_bottom + 50,
 				PlayButton[1].Width,
 				PlayButton[1].Height
 			));
 			this.setPositionFor(2, new Rectangle(
-				( g.WIDTH - GameLogo[1].Width ) / 2,
-				240,
+				( g.WIDTH - OptButton[1].Width ) / 2,
+				logo_bottom + 50 + 120,
 				OptButton[1].Width,
 				OptButton[1].Height
 			));
 			this.setPositionFor(3, new Rectangle(
-				( g.WIDTH - GameLogo[1].Width ) / 2,
-				460,
+				( g.WIDTH - ExitButton[1].Width ) / 2,
+				logo_bottom + 50 + 240,
 				ExitButton[1].Width,
 				ExitButton[1].Height
 			));
@@ -221,6 +225,9 @@ namespace MulTris {
 		public void Draw(SpriteBatch sb) {
 			if( loaded ) {
 				sb.Draw(this.menuTexture, GameLogo[0], GameLogo[1], Color.White);
+				sb.Draw(this.menuTexture, PlayButton[0], PlayButton[1], Color.White);
+				sb.Draw(this.menuTexture, OptButton[0], OptButton[1], Color.White);
+				sb.Draw(this.menuTexture, ExitButton[0], ExitButton[1], Color.White);
 			}
 		}
 
