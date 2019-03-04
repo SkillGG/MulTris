@@ -241,8 +241,12 @@ namespace MulTris {
 
 			if( inputs.StateChangeDown(bef, Keys.A) )
 				Console.WriteLine("Changed state of A");
-				
-			
+
+			MouseClick lmc = inputs.MouseClicked(bef);
+			if(lmc.button != MouseButton.NONE){
+				Console.WriteLine("Somebody clicked on: " + lmc.point);
+			}
+
 
 			return inputs;
 
