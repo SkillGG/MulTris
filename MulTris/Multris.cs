@@ -22,7 +22,9 @@ namespace MulTris {
 			T6
 		}
 
-		public GameState gamestate = GameState.MENU;
+		private GameState gamestate = GameState.MENU;
+
+		public GameState State { get { return this.gamestate; } set { this.gamestate = value; } }
 
 		public static Point ScreenCentre(int W, int H) {
 			return new Point(
@@ -133,15 +135,15 @@ namespace MulTris {
 		/// </summary>
 		/// <param name="gameTime">Provides a snapshot of timing values.</param>
 		protected override void Update(GameTime gameTime) {
-			if( GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState( ).IsKeyDown(Keys.Escape) )
-				Exit( );
 
-			// TODO: Add your update logic here
+			/*if( GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState( ).IsKeyDown(Keys.Escape) )
+					Exit( );*/
 
-			this.menu.Update(inputs);
+			if( State == GameState.MENU )
+				this.menu.Update(inputs);
+			
 
 			base.Update(gameTime);
-
 			inputs.Update( );
 		}
 
@@ -150,14 +152,14 @@ namespace MulTris {
 		/// </summary>
 		/// <param name="gameTime">Provides a snapshot of timing values.</param>
 		protected override void Draw(GameTime gameTime) {
-			GraphicsDevice.Clear(Color.CornflowerBlue);
+			GraphicsDevice.Clear(Color.Black);
 
 			// TODO: Add your drawing code here
 
 			// Start collecting .Draw(...) calls 
 			this.spriteBatch.Begin( );
 
-			if( this.gamestate == GameState.MENU ) {
+			if( this.State == GameState.MENU ) {
 				// RENDER ALL MENU SPRITES
 				this.menu.Draw(this.spriteBatch);
 

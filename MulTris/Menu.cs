@@ -10,6 +10,15 @@ namespace MulTris {
 
 		private Multris game;
 
+		private enum MenuState {
+			NORMAL,
+			EXIT
+		}
+
+		private MenuState State { set; get; } = MenuState.NORMAL;
+
+		private void ExitConfirm() { this.State = MenuState.EXIT; }
+
 		private Texture2D menuTexture;
 
 		/// <summary>
@@ -43,9 +52,30 @@ namespace MulTris {
 			new Rectangle(0, 0, 0, 0)		// Exit Button
 		};
 
+		/// <summary>
+		/// <para>This Color Array contains all Colors of buttons on-screen. What Color will they be tined in <see cref="SpriteBatch.Draw(Texture2D, Rectangle, Rectangle?, Color)"/></para>
+		/// <para>0 - Game Logo</para>
+		/// <para>1 - Play Button</para>
+		/// <para>2 - Options Button</para>
+		/// <para>3 - Exit Button</para>
+		/// </summary>
+		private Color[] menuColors = new Color[4]{
+			Color.White,				// Game Logo
+			new Color(200,200,200),		// Play Button
+			new Color(200,200,200),		// Option Button
+			new Color(200,200,200)		// Exit Button
+		};
+
 		private bool loaded = false;
 
-		public void setSpritePosFor(uint b, Nullable<Rectangle> r) {
+		public void ChangeColorFor(uint b, Nullable<Color> c) {
+			if( b > menuColors.Length - 1 )
+				return;
+			Color sc = c ?? menuColors[b];
+			menuColors[b] = sc;
+		}
+
+		public void SetSpritePosFor(uint b, Nullable<Rectangle> r) {
 			changeBTNSprite = true;
 			if( b > menuSprites.Length - 1 )
 				return;
@@ -67,7 +97,7 @@ namespace MulTris {
 			changeBTNSprite = false;
 		}
 
-		public void setPositionFor(uint b, Nullable<Rectangle> r) {
+		public void SetPositionFor(uint b, Nullable<Rectangle> r) {
 			changeBTNPos = true;
 			if( b > menuPositions.Length - 1 )
 				return;
@@ -94,7 +124,7 @@ namespace MulTris {
 		/// It is an Array containing two Rectangles:
 		/// <para>0 - buttonPosition</para>
 		/// <para>1 - buttonSprite</para>
-		/// To change it's position or sprite you have to use <see cref="Menu.setSpritePosFor(int,Rectangle)"/>/<see cref="Menu.setPositionFor(int,Rectangle)"/> with 0 as first parameter.
+		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 0 as first parameter.
 		/// </summary>
 		public Rectangle[] GameLogo {
 			get {
@@ -118,7 +148,7 @@ namespace MulTris {
 		/// It is an Array containing two Rectangles:
 		/// <para>0 - buttonPosition</para>
 		/// <para>1 - buttonSprite</para>
-		/// To change it's position or sprite you have to use <see cref="Menu.setSpritePosFor(int,Rectangle)"/>/<see cref="Menu.setPositionFor(int,Rectangle)"/> with 1 as first parameter.
+		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 1 as first parameter.
 		/// </summary>
 		public Rectangle[] PlayButton {
 			get {
@@ -142,7 +172,7 @@ namespace MulTris {
 		/// It is an Array containing two Rectangles:
 		/// <para>0 - buttonPosition</para>
 		/// <para>1 - buttonSprite</para>
-		/// To change it's position or sprite you have to use <see cref="Menu.setSpritePosFor(int,Rectangle)"/>/<see cref="Menu.setPositionFor(int,Rectangle)"/> with 2 as first parameter.
+		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 2 as first parameter.
 		/// </summary>
 		public Rectangle[] OptButton {
 			get {
@@ -166,7 +196,7 @@ namespace MulTris {
 		/// It is an Array containing two Rectangles:
 		/// <para>0 - buttonPosition</para>
 		/// <para>1 - buttonSprite</para>
-		/// To change it's position or sprite you have to use <see cref="Menu.setSpritePosFor(int,Rectangle)"/>/<see cref="Menu.setPositionFor(int,Rectangle)"/> with 3 as first parameter.
+		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 3 as first parameter.
 		/// </summary>
 		public Rectangle[] ExitButton {
 			get {
@@ -189,7 +219,7 @@ namespace MulTris {
 			this.game = g;
 			int logo_bottom = 50 + ( QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) * GameLogo[1].Height )
 				/ GameLogo[1].Width;
-			this.setPositionFor(0, new Rectangle(
+			this.SetPositionFor(0, new Rectangle(
 				( g.WIDTH - QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) ) / 2,
 				50,
 				QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100), // Make sure logo will fit in window!
@@ -197,19 +227,19 @@ namespace MulTris {
 				( QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) * GameLogo[1].Height )
 				/ GameLogo[1].Width
 			));
-			this.setPositionFor(1, new Rectangle(
+			this.SetPositionFor(1, new Rectangle(
 				( g.WIDTH - PlayButton[1].Width ) / 2,
 				logo_bottom + 50,
 				PlayButton[1].Width,
 				PlayButton[1].Height
 			));
-			this.setPositionFor(2, new Rectangle(
+			this.SetPositionFor(2, new Rectangle(
 				( g.WIDTH - OptButton[1].Width ) / 2,
 				logo_bottom + 50 + 120,
 				OptButton[1].Width,
 				OptButton[1].Height
 			));
-			this.setPositionFor(3, new Rectangle(
+			this.SetPositionFor(3, new Rectangle(
 				( g.WIDTH - ExitButton[1].Width ) / 2,
 				logo_bottom + 50 + 240,
 				ExitButton[1].Width,
@@ -224,10 +254,27 @@ namespace MulTris {
 
 		public void Draw(SpriteBatch sb) {
 			if( loaded ) {
-				sb.Draw(this.menuTexture, GameLogo[0], GameLogo[1], Color.White);
-				sb.Draw(this.menuTexture, PlayButton[0], PlayButton[1], Color.White);
-				sb.Draw(this.menuTexture, OptButton[0], OptButton[1], Color.White);
-				sb.Draw(this.menuTexture, ExitButton[0], ExitButton[1], Color.White);
+				if( State == MenuState.NORMAL ) {
+
+					sb.Draw(this.menuTexture, GameLogo[0], GameLogo[1], menuColors[0]);
+					sb.Draw(this.menuTexture, PlayButton[0], PlayButton[1], menuColors[1]);
+					sb.Draw(this.menuTexture, OptButton[0], OptButton[1], menuColors[2]);
+					sb.Draw(this.menuTexture, ExitButton[0], ExitButton[1], menuColors[3]);
+
+					// TODO: Animate
+					// TODO: Particles
+					// TODO: Background
+
+				} else {
+					float opaque = 0.3f;
+				
+					sb.Draw(this.menuTexture, GameLogo[0], GameLogo[1], menuColors[0] * opaque);
+					sb.Draw(this.menuTexture, PlayButton[0], PlayButton[1], menuColors[1] * opaque);
+					sb.Draw(this.menuTexture, OptButton[0], OptButton[1], menuColors[2] * opaque);
+					sb.Draw(this.menuTexture, ExitButton[0], ExitButton[1], menuColors[3] * opaque);
+					// TODO: Draw Exit Button/Box
+
+				}
 			}
 		}
 
@@ -238,16 +285,67 @@ namespace MulTris {
 		public InputState Update(InputState bef) {
 
 			InputState inputs = new InputState( );
+			MouseClick mc = inputs.MouseClicked(bef);
+			MouseClick mr = inputs.MouseReleased(bef);
 
-			if( inputs.StateChangeDown(bef, Keys.A) )
-				Console.WriteLine("Changed state of A");
+			if( State == MenuState.NORMAL ) {
 
-			MouseClick lmc = inputs.MouseClicked(bef);
-			if(lmc.button != MouseButton.NONE){
-				Console.WriteLine("Somebody clicked on: " + lmc.point);
+				if( inputs.gamePad1.Buttons.Back == ButtonState.Pressed || inputs.StateChangeDown(bef, Keys.Escape) )
+					ExitConfirm( );
+
+				// PlayButton
+				if( inputs.MouseRectangle.Intersects(PlayButton[0]) ) {
+					// ::hover
+					ChangeColorFor(1, Color.White);
+					if( inputs.mouse.LeftButton == ButtonState.Pressed ) {
+						ChangeColorFor(1, Color.White * 0.5f);
+					}
+					if( mr.button == MouseButton.LEFT ) {
+						// Init of select menu
+						game.State = Multris.GameState.SELECT;
+
+					}
+				} else {
+					// ::default
+					ChangeColorFor(1, new Color(200, 200, 200));
+				}
+
+				// OptButton
+				if( inputs.MouseRectangle.Intersects(OptButton[0]) ) {
+					// ::hover
+					ChangeColorFor(2, Color.White);
+					if( inputs.mouse.LeftButton == ButtonState.Pressed ) {
+						ChangeColorFor(2, Color.White * 0.5f);
+					}
+					if( mr.button == MouseButton.LEFT ) {
+						// Init of options menu
+						game.State = Multris.GameState.OPTIONS;
+
+					}
+				} else {
+					// ::default
+					ChangeColorFor(2, new Color(200, 200, 200));
+				}
+
+				// ExitButton
+				if( inputs.MouseRectangle.Intersects(ExitButton[0]) ) {
+					// ::hover
+					ChangeColorFor(3, new Color(255, 180, 180));
+					if( inputs.mouse.LeftButton == ButtonState.Pressed ) {
+						ChangeColorFor(3, new Color(255, 180, 180) * 0.99f);
+					}
+					if( mr.button == MouseButton.LEFT ) {
+						this.ExitConfirm( );
+					}
+				} else {
+					// ::default
+					ChangeColorFor(3, new Color(200, 200, 200));
+				}
+
+			} else {
+				// Handle get-out-of-the-game mouse click/press
+
 			}
-
-
 			return inputs;
 
 		}
