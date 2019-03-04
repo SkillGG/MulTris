@@ -27,12 +27,16 @@ namespace MulTris {
 		/// <para>1 - Play Button</para>
 		/// <para>2 - Options Button</para>
 		/// <para>3 - Exit Button</para>
+		/// <para>4 - Close Window</para>
+		/// <para>5 - Close Close Window</para>
 		/// </summary>
-		private Rectangle[] menuSprites = new Rectangle[4] {
+		private Rectangle[] menuSprites = new Rectangle[6] {
 			new Rectangle(0, 100, 900, 180),	// Game Logo
 			new Rectangle(0, 0, 240, 100),		// Play Button
 			new Rectangle(240, 0, 240, 100),	// Options Button
-			new Rectangle(480, 0, 240, 100)		// Exit Button
+			new Rectangle(480, 0, 240, 100),	// Exit Button
+			new Rectangle(0, 280, 800, 600),	// Close Window
+			new Rectangle(720, 0, 40, 40)		// Close Close Window
 		};
 
 		private bool changeBTNPos = false;
@@ -44,12 +48,16 @@ namespace MulTris {
 		/// <para>1 - Play Button</para>
 		/// <para>2 - Options Button</para>
 		/// <para>3 - Exit Button</para>
+		/// <para>4 - Close Window</para>
+		/// <para>5 - Close Close Window</para>
 		/// </summary>
-		private Rectangle[] menuPositions = new Rectangle[4] {
+		private Rectangle[] menuPositions = new Rectangle[6] {
 			new Rectangle(0, 0, 0, 0),		// Game Logo
 			new Rectangle(0, 0, 0, 0),		// Play Button
 			new Rectangle(0, 0, 0, 0),		// Options Button
-			new Rectangle(0, 0, 0, 0)		// Exit Button
+			new Rectangle(0, 0, 0, 0),		// Exit Button
+			new Rectangle(0, 0, 0, 0),		// Close Window
+			new Rectangle(0, 0, 0, 0)		// Close Close Window
 		};
 
 		/// <summary>
@@ -58,12 +66,16 @@ namespace MulTris {
 		/// <para>1 - Play Button</para>
 		/// <para>2 - Options Button</para>
 		/// <para>3 - Exit Button</para>
+		/// <para>4 - Close Window</para>
+		/// <para>5 - Close Close Window</para>
 		/// </summary>
-		private Color[] menuColors = new Color[4]{
+		private Color[] menuColors = new Color[6]{
 			Color.White,				// Game Logo
 			new Color(200,200,200),		// Play Button
 			new Color(200,200,200),		// Option Button
-			new Color(200,200,200)		// Exit Button
+			new Color(200,200,200),		// Exit Button
+			Color.White,				// Close Window
+			Color.White					// Close Close Window
 		};
 
 		private bool loaded = false;
@@ -93,6 +105,12 @@ namespace MulTris {
 				case 3:
 					ExitButton = new Rectangle[2] { sr, sr };
 					break;
+				case 4:
+					CloseWindow = new Rectangle[2] { sr, sr };
+					break;
+				case 5:
+					CloseCloseWindow = new Rectangle[2] { sr, sr };
+					break;
 			}
 			changeBTNSprite = false;
 		}
@@ -114,6 +132,12 @@ namespace MulTris {
 					break;
 				case 3:
 					ExitButton = new Rectangle[2] { sr, sr };
+					break;
+				case 4:
+					CloseWindow = new Rectangle[2] { sr, sr };
+					break;
+				case 5:
+					CloseCloseWindow = new Rectangle[2] { sr, sr };
 					break;
 			}
 			changeBTNPos = false;
@@ -215,42 +239,111 @@ namespace MulTris {
 			}
 		}
 
+		/// <summary>
+		/// An Exit Button Parameter.
+		/// It is an Array containing two Rectangles:
+		/// <para>0 - buttonPosition</para>
+		/// <para>1 - buttonSprite</para>
+		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 3 as first parameter.
+		/// </summary>
+		public Rectangle[] CloseWindow {
+			get {
+				return new Rectangle[2] { menuPositions[4], menuSprites[4] };
+			}
+			set {
+				if( changeBTNPos && changeBTNSprite ) {
+					changeBTNPos = false;
+					changeBTNSprite = false;
+					throw new InvalidOperationException("You should not be able to do that operation!");
+				}
+				if( changeBTNPos )
+					menuPositions[4] = value[0];
+				if( changeBTNSprite )
+					menuSprites[4] = value[0];
+			}
+		}
+
+		/// <summary>
+		/// An Close CloseWindow Parameter.
+		/// It is an Array containing two Rectangles:
+		/// <para>0 - buttonPosition</para>
+		/// <para>1 - buttonSprite</para>
+		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 3 as first parameter.
+		/// </summary>
+		public Rectangle[] CloseCloseWindow {
+			get {
+				return new Rectangle[2] { menuPositions[5], menuSprites[5] };
+			}
+			set {
+				if( changeBTNPos && changeBTNSprite ) {
+					changeBTNPos = false;
+					changeBTNSprite = false;
+					throw new InvalidOperationException("You should not be able to do that operation!");
+				}
+				if( changeBTNPos )
+					menuPositions[5] = value[0];
+				if( changeBTNSprite )
+					menuSprites[5] = value[0];
+			}
+		}
+
 		public Menu(Multris g) {
+
 			this.game = g;
-			int logo_bottom = 50 + ( QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) * GameLogo[1].Height )
-				/ GameLogo[1].Width;
-			this.SetPositionFor(0, new Rectangle(
-				( g.WIDTH - QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) ) / 2,
-				50,
-				QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100), // Make sure logo will fit in window!
-																			// Compute Scaled Height:
-				( QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) * GameLogo[1].Height )
-				/ GameLogo[1].Width
+
+			// Compute sprite scales for lower resolutions!
+
+			// Compute CloseWindow for lower resolutions
+			int marginCW = 50;
+			int widthCW = QuickMaths._IRB(false, CloseWindow[1].Width, 0, g.WIDTH - ( 2 * marginCW ));
+			int heightCW = widthCW * CloseWindow[1].Height / CloseWindow[1].Width;
+			int xCW = ( g.WIDTH - widthCW ) / 2;
+			int yCW = ( g.HEIGHT - heightCW ) / 2;
+			int widthCCW = CloseCloseWindow[1].Width * widthCW / CloseWindow[1].Width;
+			int heightCCW = CloseCloseWindow[1].Height * heightCW / CloseWindow[1].Height;
+			int xCCW = xCW + widthCW - widthCCW;
+			int yCCW = yCW;
+
+			// Compute Logo for lower resolutions
+			int widthL = QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100);
+			int heightL = ( QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) * GameLogo[1].Height ) / GameLogo[1].Width;
+			int xL = ( g.WIDTH - QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) ) / 2;
+			int logo_bottom = 50 + heightL;
+
+			this.SetPositionFor(0, new Rectangle(xL, 50, widthL, heightL));         // Set position for LOGO
+			this.SetPositionFor(1, new Rectangle(                                   // Set position for PlayButton
+				( g.WIDTH - PlayButton[1].Width ) / 2,                              // Middle of Window
+				logo_bottom + 50,                                                   // 50px under LOGO
+				PlayButton[1].Width,                                                // Original width
+				PlayButton[1].Height                                                // Original height
 			));
-			this.SetPositionFor(1, new Rectangle(
-				( g.WIDTH - PlayButton[1].Width ) / 2,
-				logo_bottom + 50,
-				PlayButton[1].Width,
-				PlayButton[1].Height
+			this.SetPositionFor(2, new Rectangle(                                   // Set position for OptButton
+				( g.WIDTH - OptButton[1].Width ) / 2,                               // Middle of Window
+				logo_bottom + 100 + 50 + 20,                                        // 20px under previous button
+				OptButton[1].Width,                                                 // Original width
+				OptButton[1].Height                                                 // Original height
 			));
-			this.SetPositionFor(2, new Rectangle(
-				( g.WIDTH - OptButton[1].Width ) / 2,
-				logo_bottom + 50 + 120,
-				OptButton[1].Width,
-				OptButton[1].Height
+			this.SetPositionFor(3, new Rectangle(                                   // Set position for ExitButton
+				( g.WIDTH - ExitButton[1].Width ) / 2,                              // Middle of Window
+				logo_bottom + 50 + 240,                                             // 20px under previous button
+				ExitButton[1].Width,                                                // Original width
+				ExitButton[1].Height                                                // Original height
 			));
-			this.SetPositionFor(3, new Rectangle(
-				( g.WIDTH - ExitButton[1].Width ) / 2,
-				logo_bottom + 50 + 240,
-				ExitButton[1].Width,
-				ExitButton[1].Height
-			));
+			this.SetPositionFor(4, new Rectangle(xCW, yCW, widthCW, heightCW));     // Set position for CloseWindow
+			this.SetPositionFor(5, new Rectangle(xCCW, yCCW, widthCCW, heightCCW)); //Set position for CloseCloseWindow
+
+			// ExitTextRectangle = new Rectangle(xCW + marginCW, yCW + marginCW, widthCW - marginCW * 2, heightCW - marginCW * 2);
 		}
 
 		public void Load(ContentManager cm) {
 			menuTexture = cm.Load<Texture2D>("MainMenu/mainMenu");
 			loaded = true;
 		}
+
+		/* THIS SOLUTION IS CPU HEAVY. USE ONLY WHEN NECESARRY
+		public RasterizerState ExitTextRaster = new RasterizerState( ) { ScissorTestEnable = true };
+		private Rectangle ExitTextRectangle;
+		*/
 
 		public void Draw(SpriteBatch sb) {
 			if( loaded ) {
@@ -267,13 +360,32 @@ namespace MulTris {
 
 				} else {
 					float opaque = 0.3f;
-				
 					sb.Draw(this.menuTexture, GameLogo[0], GameLogo[1], menuColors[0] * opaque);
 					sb.Draw(this.menuTexture, PlayButton[0], PlayButton[1], menuColors[1] * opaque);
 					sb.Draw(this.menuTexture, OptButton[0], OptButton[1], menuColors[2] * opaque);
 					sb.Draw(this.menuTexture, ExitButton[0], ExitButton[1], menuColors[3] * opaque);
-					// TODO: Draw Exit Button/Box
+					sb.Draw(this.menuTexture, CloseWindow[0], CloseWindow[1], menuColors[4]);
+					sb.Draw(this.menuTexture, CloseCloseWindow[0], CloseCloseWindow[1], menuColors[5]);
 
+					SpriteFont fira = this.game.FiraLight24;
+					String s = "Are you sure?";
+					Vector2 sWH = fira.MeasureString(s);
+
+					sb.DrawString(this.game.FiraLight24, s, new Vector2(
+						CloseWindow[0].X + ( CloseWindow[0].Width - sWH.X ) / 2,
+						CloseWindow[0].Y + ( CloseWindow[0].Height - sWH.Y ) / 2
+					), Color.White);
+
+					/* THIS IS CPU HEAVY NOT OPTIMAL SOLUTION (Uses second sb.Begin(...))!
+					sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, ExitTextRaster); 
+					Rectangle tempR = sb.GraphicsDevice.ScissorRectangle;		// Save Original ScissorRect
+					sb.GraphicsDevice.ScissorRectangle = ExitTextRectangle;		// Set new ScissorRect
+					// Draw
+					sb.DrawString(this.game.FiraLight24, "Are you sure?", Vector2.Zero, Color.White);
+					// Draw
+					sb.GraphicsDevice.ScissorRectangle = tempR;					// Reset to Original ScissorRect
+					sb.End( );
+					*/
 				}
 			}
 		}

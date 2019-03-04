@@ -22,6 +22,11 @@ namespace MulTris {
 			T6
 		}
 
+		// FONTS
+		public SpriteFont FiraLight24;
+		// FONTS
+		
+
 		private GameState gamestate = GameState.MENU;
 
 		public GameState State { get { return this.gamestate; } set { this.gamestate = value; } }
@@ -37,7 +42,7 @@ namespace MulTris {
 			return new Rectangle(0, 0, WIDTH, HEIGHT).Center;
 		}
 
-		private const int DEFRES = 1024;
+		private const int DEFRES = 800;
 		private int[] useRes = new int[2] { DEFRES, DEFRES / 12 * 9 };
 		private bool fullScreen = false;
 		private bool borderLess = true;
@@ -116,6 +121,8 @@ namespace MulTris {
 			this.spriteBatch = new SpriteBatch(GraphicsDevice);
 
 			// TODO: use this.Content to load your game content here
+
+			this.FiraLight24 = this.Content.Load<SpriteFont>("Fira");
 
 			menu.Load(this.Content);
 
