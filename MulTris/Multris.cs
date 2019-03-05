@@ -136,6 +136,10 @@ namespace MulTris {
 			// TODO: Unload any non ContentManager content here
 		}
 
+		public void Terminate(){
+			this.Exit( );
+		}
+
 		/// <summary>
 		/// Allows the game to run logic such as updating the world,
 		/// checking for collisions, gathering input, and playing audio.
@@ -145,7 +149,8 @@ namespace MulTris {
 
 			/*if( GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState( ).IsKeyDown(Keys.Escape) )
 					Exit( );*/
-
+			if( new InputState( ).KeyUp(inputs, Keys.Escape) )
+				Console.WriteLine("KeyUp!");
 			if( State == GameState.MENU )
 				this.menu.Update(inputs);
 			

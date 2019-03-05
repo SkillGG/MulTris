@@ -30,13 +30,14 @@ namespace MulTris {
 		/// <para>4 - Close Window</para>
 		/// <para>5 - Close Close Window</para>
 		/// </summary>
-		private Rectangle[] menuSprites = new Rectangle[6] {
+		private Rectangle[] menuSprites = new Rectangle[7] {
 			new Rectangle(0, 100, 900, 180),	// Game Logo
 			new Rectangle(0, 0, 240, 100),		// Play Button
 			new Rectangle(240, 0, 240, 100),	// Options Button
 			new Rectangle(480, 0, 240, 100),	// Exit Button
 			new Rectangle(0, 280, 800, 600),	// Close Window
-			new Rectangle(720, 0, 40, 40)		// Close Close Window
+			new Rectangle(720, 0, 40, 40),		// Close Close Window
+			new Rectangle(0, 880, 240, 100)		// Confirm Close Button
 		};
 
 		private bool changeBTNPos = false;
@@ -51,13 +52,14 @@ namespace MulTris {
 		/// <para>4 - Close Window</para>
 		/// <para>5 - Close Close Window</para>
 		/// </summary>
-		private Rectangle[] menuPositions = new Rectangle[6] {
+		private Rectangle[] menuPositions = new Rectangle[7] {
 			new Rectangle(0, 0, 0, 0),		// Game Logo
 			new Rectangle(0, 0, 0, 0),		// Play Button
 			new Rectangle(0, 0, 0, 0),		// Options Button
 			new Rectangle(0, 0, 0, 0),		// Exit Button
 			new Rectangle(0, 0, 0, 0),		// Close Window
-			new Rectangle(0, 0, 0, 0)		// Close Close Window
+			new Rectangle(0, 0, 0, 0),		// Close Close Window
+			new Rectangle(0, 0, 0, 0)		// Confirm Close Button
 		};
 
 		/// <summary>
@@ -69,22 +71,31 @@ namespace MulTris {
 		/// <para>4 - Close Window</para>
 		/// <para>5 - Close Close Window</para>
 		/// </summary>
-		private Color[] menuColors = new Color[6]{
+		private Color[] menuColors = new Color[7]{
 			Color.White,				// Game Logo
 			new Color(200,200,200),		// Play Button
 			new Color(200,200,200),		// Option Button
 			new Color(200,200,200),		// Exit Button
 			Color.White,				// Close Window
-			Color.White					// Close Close Window
+			Color.White,				// Close Close Window
+			new Color(200,200,200)		// Confirm Close Button
 		};
 
 		private bool loaded = false;
 
-		public void ChangeColorFor(uint b, Nullable<Color> c) {
+		public void ChangeColorFor(uint b, Color? c) {
 			if( b > menuColors.Length - 1 )
 				return;
 			Color sc = c ?? menuColors[b];
 			menuColors[b] = sc;
+		}
+
+		public void ChangeColorForNew(uint b, Color? c) {
+			if( b > menuColors.Length - 1 )
+				return;
+			Color sc = c ?? menuColors[b];
+			if( !sc.Equals(menuColors[b]) )
+				ChangeColorFor(b, c);
 		}
 
 		public void SetSpritePosFor(uint b, Nullable<Rectangle> r) {
@@ -110,6 +121,9 @@ namespace MulTris {
 					break;
 				case 5:
 					CloseCloseWindow = new Rectangle[2] { sr, sr };
+					break;
+				case 6:
+					ConfirmCloseButton = new Rectangle[2] { sr, sr };
 					break;
 			}
 			changeBTNSprite = false;
@@ -138,6 +152,9 @@ namespace MulTris {
 					break;
 				case 5:
 					CloseCloseWindow = new Rectangle[2] { sr, sr };
+					break;
+				case 6:
+					ConfirmCloseButton = new Rectangle[2] { sr, sr };
 					break;
 			}
 			changeBTNPos = false;
@@ -287,6 +304,30 @@ namespace MulTris {
 			}
 		}
 
+		/// <summary>
+		/// An Confirm CloseWindow Parameter.
+		/// It is an Array containing two Rectangles:
+		/// <para>0 - buttonPosition</para>
+		/// <para>1 - buttonSprite</para>
+		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 3 as first parameter.
+		/// </summary>
+		public Rectangle[] ConfirmCloseButton {
+			get {
+				return new Rectangle[2] { menuPositions[6], menuSprites[6] };
+			}
+			set {
+				if( changeBTNPos && changeBTNSprite ) {
+					changeBTNPos = false;
+					changeBTNSprite = false;
+					throw new InvalidOperationException("You should not be able to do that operation!");
+				}
+				if( changeBTNPos )
+					menuPositions[6] = value[0];
+				if( changeBTNSprite )
+					menuSprites[6] = value[0];
+			}
+		}
+
 		public Menu(Multris g) {
 
 			this.game = g;
@@ -303,6 +344,8 @@ namespace MulTris {
 			int heightCCW = CloseCloseWindow[1].Height * heightCW / CloseWindow[1].Height;
 			int xCCW = xCW + widthCW - widthCCW;
 			int yCCW = yCW;
+			int xcCW = xCW + ( ( widthCW - ConfirmCloseButton[1].Width ) / 2 );
+			int ycCW = yCW + heightCW - ConfirmCloseButton[1].Height - 50;
 
 			// Compute Logo for lower resolutions
 			int widthL = QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100);
@@ -330,7 +373,11 @@ namespace MulTris {
 				ExitButton[1].Height                                                // Original height
 			));
 			this.SetPositionFor(4, new Rectangle(xCW, yCW, widthCW, heightCW));     // Set position for CloseWindow
-			this.SetPositionFor(5, new Rectangle(xCCW, yCCW, widthCCW, heightCCW)); //Set position for CloseCloseWindow
+			this.SetPositionFor(5, new Rectangle(xCCW, yCCW, widthCCW, heightCCW)); // Set position for CloseCloseWindow
+																					// Set position for ConfirmCloseWindow
+			this.SetPositionFor(6, new Rectangle(xcCW, ycCW, ConfirmCloseButton[1].Width, ConfirmCloseButton[1].Height));
+
+
 
 			// ExitTextRectangle = new Rectangle(xCW + marginCW, yCW + marginCW, widthCW - marginCW * 2, heightCW - marginCW * 2);
 		}
@@ -347,34 +394,33 @@ namespace MulTris {
 
 		public void Draw(SpriteBatch sb) {
 			if( loaded ) {
-				if( State == MenuState.NORMAL ) {
+				float opaque = 1.0f;
 
-					sb.Draw(this.menuTexture, GameLogo[0], GameLogo[1], menuColors[0]);
-					sb.Draw(this.menuTexture, PlayButton[0], PlayButton[1], menuColors[1]);
-					sb.Draw(this.menuTexture, OptButton[0], OptButton[1], menuColors[2]);
-					sb.Draw(this.menuTexture, ExitButton[0], ExitButton[1], menuColors[3]);
+				if( State == MenuState.EXIT )                                                           // If MenuState.EXIT
+					opaque = 0.3f;                                                                      // Change opacity for GL/PB/OB/EB to 0.3
 
-					// TODO: Animate
-					// TODO: Particles
-					// TODO: Background
+				sb.Draw(this.menuTexture, GameLogo[0], GameLogo[1], menuColors[0] * opaque);            // Draw GameLogo
+				sb.Draw(this.menuTexture, PlayButton[0], PlayButton[1], menuColors[1] * opaque);        // Draw PlayButton
+				sb.Draw(this.menuTexture, OptButton[0], OptButton[1], menuColors[2] * opaque);          // Draw OptionButton
+				sb.Draw(this.menuTexture, ExitButton[0], ExitButton[1], menuColors[3] * opaque);        // Draw ExitButton
 
-				} else {
-					float opaque = 0.3f;
-					sb.Draw(this.menuTexture, GameLogo[0], GameLogo[1], menuColors[0] * opaque);
-					sb.Draw(this.menuTexture, PlayButton[0], PlayButton[1], menuColors[1] * opaque);
-					sb.Draw(this.menuTexture, OptButton[0], OptButton[1], menuColors[2] * opaque);
-					sb.Draw(this.menuTexture, ExitButton[0], ExitButton[1], menuColors[3] * opaque);
-					sb.Draw(this.menuTexture, CloseWindow[0], CloseWindow[1], menuColors[4]);
-					sb.Draw(this.menuTexture, CloseCloseWindow[0], CloseCloseWindow[1], menuColors[5]);
+				if( State == MenuState.EXIT ) {
 
-					SpriteFont fira = this.game.FiraLight24;
-					String s = "Are you sure?";
-					Vector2 sWH = fira.MeasureString(s);
+					sb.Draw(this.menuTexture, CloseWindow[0], CloseWindow[1], menuColors[4]);                   // Draw CloseWindow
+					sb.Draw(this.menuTexture, CloseCloseWindow[0], CloseCloseWindow[1], menuColors[5]);         // Draw Close CloseWindow Button
+					sb.Draw(this.menuTexture, ConfirmCloseButton[0], ConfirmCloseButton[1], menuColors[6]);     // Draw Confirm CloseWindow Button
 
-					sb.DrawString(this.game.FiraLight24, s, new Vector2(
-						CloseWindow[0].X + ( CloseWindow[0].Width - sWH.X ) / 2,
-						CloseWindow[0].Y + ( CloseWindow[0].Height - sWH.Y ) / 2
-					), Color.White);
+					SpriteFont fira = this.game.FiraLight24;                            // Save locally font
+
+					String ays = "Are you sure?";                                       // Store String to show
+					Vector2 aysPoint =                                                  // Calculate position of string
+					new Vector2(CloseWindow[0].X + ( CloseWindow[0].Width - fira.MeasureString(ays).X ) / 2, CloseWindow[0].Y + ( CloseWindow[0].Height - fira.MeasureString(ays).Y ) / 2);
+					sb.DrawString(fira, ays, aysPoint, Color.White);                    //	Draw string
+
+					String yes = "Yes";                                                 // Store String to show
+					Vector2 yesPoint =                                                  // Calculate position of string
+					new Vector2(ConfirmCloseButton[0].X + ( ConfirmCloseButton[0].Width - fira.MeasureString(yes).X ) / 2, ConfirmCloseButton[0].Y + ( ConfirmCloseButton[0].Height - fira.MeasureString(yes).Y ) / 2);
+					sb.DrawString(fira, yes, yesPoint, menuColors[6]);                  // Draw string
 
 					/* THIS IS CPU HEAVY NOT OPTIMAL SOLUTION (Uses second sb.Begin(...))!
 					sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, ExitTextRaster); 
@@ -402,15 +448,16 @@ namespace MulTris {
 
 			if( State == MenuState.NORMAL ) {
 
-				if( inputs.gamePad1.Buttons.Back == ButtonState.Pressed || inputs.StateChangeDown(bef, Keys.Escape) )
+				// If player clicked BACK/ESCAPE
+				if( inputs.ButtonUpAny(bef, Buttons.Back) || inputs.KeyUp(bef, Keys.Escape) )
 					ExitConfirm( );
 
 				// PlayButton
 				if( inputs.MouseRectangle.Intersects(PlayButton[0]) ) {
 					// ::hover
-					ChangeColorFor(1, Color.White);
+					ChangeColorForNew(1, Color.White);
 					if( inputs.mouse.LeftButton == ButtonState.Pressed ) {
-						ChangeColorFor(1, Color.White * 0.5f);
+						ChangeColorForNew(1, Color.White * 0.5f);
 					}
 					if( mr.button == MouseButton.LEFT ) {
 						// Init of select menu
@@ -419,15 +466,15 @@ namespace MulTris {
 					}
 				} else {
 					// ::default
-					ChangeColorFor(1, new Color(200, 200, 200));
+					ChangeColorForNew(1, new Color(200, 200, 200));
 				}
 
 				// OptButton
 				if( inputs.MouseRectangle.Intersects(OptButton[0]) ) {
 					// ::hover
-					ChangeColorFor(2, Color.White);
+					ChangeColorForNew(2, Color.White);
 					if( inputs.mouse.LeftButton == ButtonState.Pressed ) {
-						ChangeColorFor(2, Color.White * 0.5f);
+						ChangeColorForNew(2, Color.White * 0.5f);
 					}
 					if( mr.button == MouseButton.LEFT ) {
 						// Init of options menu
@@ -436,26 +483,61 @@ namespace MulTris {
 					}
 				} else {
 					// ::default
-					ChangeColorFor(2, new Color(200, 200, 200));
+					ChangeColorForNew(2, new Color(200, 200, 200));
 				}
 
 				// ExitButton
 				if( inputs.MouseRectangle.Intersects(ExitButton[0]) ) {
 					// ::hover
-					ChangeColorFor(3, new Color(255, 180, 180));
+					ChangeColorForNew(3, new Color(255, 180, 180));
 					if( inputs.mouse.LeftButton == ButtonState.Pressed ) {
-						ChangeColorFor(3, new Color(255, 180, 180) * 0.99f);
+						ChangeColorForNew(3, new Color(255, 180, 180) * 0.8f);
 					}
 					if( mr.button == MouseButton.LEFT ) {
 						this.ExitConfirm( );
 					}
 				} else {
 					// ::default
-					ChangeColorFor(3, new Color(200, 200, 200));
+					ChangeColorForNew(3, new Color(200, 200, 200));
 				}
 
 			} else {
 				// Handle get-out-of-the-game mouse click/press
+
+				// If clicked escape or back: cancel
+				if( inputs.KeyUp(bef, Keys.Escape) || inputs.ButtonUpAny(bef, Buttons.Back) ) {
+					this.State = Menu.MenuState.NORMAL;
+				}
+
+				// If clicked enter or A: exit game
+				if( inputs.KeyUp(bef, Keys.Enter) || inputs.ButtonUpAny(bef, Buttons.A) ) {
+					game.Terminate( );
+				}
+
+				// Close CloseWindow Button
+				if( inputs.MouseRectangle.Intersects(CloseCloseWindow[0]) ) {
+					// ::hover
+					if( mr.button == MouseButton.LEFT ) {
+						// MouseReleased
+						this.State = Menu.MenuState.NORMAL;
+					}
+				}
+
+				// Confirm CloseWindow Button
+				if( inputs.MouseRectangle.Intersects(ConfirmCloseButton[0]) ) {
+					// ::hover
+					ChangeColorForNew(6, new Color(255, 180, 180));
+					if( inputs.mouse.LeftButton == ButtonState.Pressed ) {
+						ChangeColorForNew(6, new Color(255, 180, 180) * 0.8f);
+					}
+					if( mr.button == MouseButton.LEFT ) {
+						game.Terminate( );
+					}
+				} else {
+					// ::default
+					ChangeColorForNew(6, new Color(200, 200, 200));
+				}
+
 
 			}
 			return inputs;
