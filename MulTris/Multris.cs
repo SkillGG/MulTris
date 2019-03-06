@@ -25,7 +25,7 @@ namespace MulTris {
 		// FONTS
 		public SpriteFont FiraLight24;
 		// FONTS
-		
+
 
 		private GameState gamestate = GameState.MENU;
 
@@ -73,6 +73,8 @@ namespace MulTris {
 
 		public Menu menu;
 
+		public SelectMenu selectmenu;
+
 		public Multris() {
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
@@ -106,8 +108,8 @@ namespace MulTris {
 			// TODO: Add your initialization logic here
 
 			this.inputs = new InputState( );
-
 			this.menu = new Menu(this);
+			this.selectmenu = new SelectMenu(this);
 
 			base.Initialize( );
 		}
@@ -125,6 +127,7 @@ namespace MulTris {
 			this.FiraLight24 = this.Content.Load<SpriteFont>("Fira");
 
 			menu.Load(this.Content);
+			selectmenu.Load(Content);
 
 		}
 
@@ -136,7 +139,7 @@ namespace MulTris {
 			// TODO: Unload any non ContentManager content here
 		}
 
-		public void Terminate(){
+		public void Terminate() {
 			this.Exit( );
 		}
 
@@ -153,7 +156,9 @@ namespace MulTris {
 				Console.WriteLine("KeyUp!");
 			if( State == GameState.MENU )
 				this.menu.Update(inputs);
-			
+			if( State == GameState.SELECT )
+				this.selectmenu.Update(inputs);
+
 
 			base.Update(gameTime);
 			inputs.Update( );
@@ -174,8 +179,10 @@ namespace MulTris {
 			if( this.State == GameState.MENU ) {
 				// RENDER ALL MENU SPRITES
 				this.menu.Draw(this.spriteBatch);
-
 			}
+			if( this.State == GameState.SELECT )
+				this.selectmenu.Draw(spriteBatch);
+
 			// Render everything on screen
 			this.spriteBatch.End( );
 
