@@ -16,14 +16,12 @@ namespace MulTris {
 			MENU,
 			SELECT,
 			OPTIONS,
-			T3,
-			T4,
-			T5,
-			T6
+			GAME
 		}
 
 		// FONTS
 		public SpriteFont FiraLight24;
+		public SpriteFont FiraLight20;
 		// FONTS
 
 
@@ -67,6 +65,11 @@ namespace MulTris {
 			this.graphics.IsFullScreen = FULLSCREEN;
 			Window.IsBorderless = BORDERLESS;
 			this.graphics.ApplyChanges( );
+		}
+
+		public void InitializeGame(/*GameOption<TYPE>? NAME, ...*/){
+			// INITIALIZE GAME WITH GIVEN OPTIONS
+
 		}
 
 		private InputState inputs;
@@ -124,7 +127,8 @@ namespace MulTris {
 
 			// TODO: use this.Content to load your game content here
 
-			this.FiraLight24 = this.Content.Load<SpriteFont>("Fira");
+			this.FiraLight24 = this.Content.Load<SpriteFont>("Fonts/Fira24");
+			this.FiraLight20 = this.Content.Load<SpriteFont>("Fonts/Fira20");
 
 			menu.Load(this.Content);
 			selectmenu.Load(Content);
@@ -175,6 +179,8 @@ namespace MulTris {
 
 			// Start collecting .Draw(...) calls 
 			this.spriteBatch.Begin( );
+
+			//this.spriteBatch.DrawString(FiraLight20, ("G: "+this.State+" M: "+this.menu.State+" S: " + this.selectmenu.State), new Vector2(0, 0), Color.Red);
 
 			if( this.State == GameState.MENU ) {
 				// RENDER ALL MENU SPRITES

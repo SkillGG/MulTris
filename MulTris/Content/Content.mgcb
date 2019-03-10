@@ -13,12 +13,19 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Fira.spritefont
+#begin Fonts/Fira20.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:Fira.spritefont
+/build:Fonts/Fira20.spritefont
+
+#begin Fonts/Fira24.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/Fira24.spritefont
 
 #begin MainMenu/mainMenu.png
 /importer:TextureImporter

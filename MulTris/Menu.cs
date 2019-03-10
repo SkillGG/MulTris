@@ -10,16 +10,16 @@ namespace MulTris {
 
 		private Multris game;
 
-		private enum MenuState {
+		public enum MenuState {
 			NORMAL,
 			EXIT
 		}
 
-		private MenuState State { set; get; } = MenuState.NORMAL;
+		public MenuState State { set; get; } = MenuState.NORMAL;
 
 		private void ExitConfirm() { this.State = MenuState.EXIT; }
 
-		private Texture2D menuTexture;
+		private Texture2D texture;
 
 		/// <summary>
 		/// <para>This Rectangle Array contains source placements of given elements from MainMenu/mainMenu texture.</para>
@@ -30,7 +30,7 @@ namespace MulTris {
 		/// <para>4 - Close Window</para>
 		/// <para>5 - Close Close Window</para>
 		/// </summary>
-		private Rectangle[] menuSprites = new Rectangle[7] {
+		private Rectangle[] sprites = new Rectangle[7] {
 			new Rectangle(0, 100, 900, 180),	// Game Logo
 			new Rectangle(0, 0, 240, 100),		// Play Button
 			new Rectangle(240, 0, 240, 100),	// Options Button
@@ -52,7 +52,7 @@ namespace MulTris {
 		/// <para>4 - Close Window</para>
 		/// <para>5 - Close Close Window</para>
 		/// </summary>
-		private Rectangle[] menuPositions = new Rectangle[7] {
+		private Rectangle[] positions = new Rectangle[7] {
 			new Rectangle(0, 0, 0, 0),		// Game Logo
 			new Rectangle(0, 0, 0, 0),		// Play Button
 			new Rectangle(0, 0, 0, 0),		// Options Button
@@ -71,7 +71,7 @@ namespace MulTris {
 		/// <para>4 - Close Window</para>
 		/// <para>5 - Close Close Window</para>
 		/// </summary>
-		private Color[] menuColors = new Color[7]{
+		private Color[] colors = new Color[7]{
 			Color.White,				// Game Logo
 			new Color(200,200,200),		// Play Button
 			new Color(200,200,200),		// Option Button
@@ -84,25 +84,25 @@ namespace MulTris {
 		private bool loaded = false;
 
 		public void ChangeColorFor(uint b, Color? c) {
-			if( b > menuColors.Length - 1 )
+			if( b > colors.Length - 1 )
 				return;
-			Color sc = c ?? menuColors[b];
-			menuColors[b] = sc;
+			Color sc = c ?? colors[b];
+			colors[b] = sc;
 		}
 
 		public void ChangeColorForNew(uint b, Color? c) {
-			if( b > menuColors.Length - 1 )
+			if( b > colors.Length - 1 )
 				return;
-			Color sc = c ?? menuColors[b];
-			if( !sc.Equals(menuColors[b]) )
+			Color sc = c ?? colors[b];
+			if( !sc.Equals(colors[b]) )
 				ChangeColorFor(b, c);
 		}
 
 		public void SetSpritePosFor(uint b, Nullable<Rectangle> r) {
 			changeBTNSprite = true;
-			if( b > menuSprites.Length - 1 )
+			if( b > sprites.Length - 1 )
 				return;
-			Rectangle sr = r ?? menuSprites[b];
+			Rectangle sr = r ?? sprites[b];
 			switch( b ) {
 				case 0:
 					GameLogo = new Rectangle[2] { sr, sr };
@@ -131,9 +131,9 @@ namespace MulTris {
 
 		public void SetPositionFor(uint b, Nullable<Rectangle> r) {
 			changeBTNPos = true;
-			if( b > menuPositions.Length - 1 )
+			if( b > positions.Length - 1 )
 				return;
-			Rectangle sr = r ?? menuPositions[b];
+			Rectangle sr = r ?? positions[b];
 			switch( b ) {
 				case 0:
 					GameLogo = new Rectangle[2] { sr, sr };
@@ -163,13 +163,13 @@ namespace MulTris {
 		/// <summary>
 		/// A Menu Logo Parameter.
 		/// It is an Array containing two Rectangles:
-		/// <para>0 - buttonPosition</para>
-		/// <para>1 - buttonSprite</para>
+		/// <para>0 - position on screen</para>
+		/// <para>1 - position on sprite</para>
 		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 0 as first parameter.
 		/// </summary>
 		public Rectangle[] GameLogo {
 			get {
-				return new Rectangle[2] { menuPositions[0], menuSprites[0] };
+				return new Rectangle[2] { positions[0], sprites[0] };
 			}
 			set {
 				if( changeBTNPos && changeBTNSprite ) {
@@ -178,22 +178,22 @@ namespace MulTris {
 					throw new InvalidOperationException("You should not be able to do that operation!");
 				}
 				if( changeBTNPos )
-					menuPositions[0] = value[0];
+					positions[0] = value[0];
 				if( changeBTNSprite )
-					menuSprites[0] = value[0];
+					sprites[0] = value[0];
 			}
 		}
 
 		/// <summary>
 		/// A Play Button Parameter.
 		/// It is an Array containing two Rectangles:
-		/// <para>0 - buttonPosition</para>
-		/// <para>1 - buttonSprite</para>
+		/// <para>0 - position on screen</para>
+		/// <para>1 - position on sprite</para>
 		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 1 as first parameter.
 		/// </summary>
 		public Rectangle[] PlayButton {
 			get {
-				return new Rectangle[2] { menuPositions[1], menuSprites[1] };
+				return new Rectangle[2] { positions[1], sprites[1] };
 			}
 			set {
 				if( changeBTNPos && changeBTNSprite ) {
@@ -202,22 +202,22 @@ namespace MulTris {
 					throw new InvalidOperationException("You should not be able to do that operation!");
 				}
 				if( changeBTNPos )
-					menuPositions[1] = value[0];
+					positions[1] = value[0];
 				if( changeBTNSprite )
-					menuSprites[1] = value[0];
+					sprites[1] = value[0];
 			}
 		}
 
 		/// <summary>
 		/// An Option Button Parameter.
 		/// It is an Array containing two Rectangles:
-		/// <para>0 - buttonPosition</para>
-		/// <para>1 - buttonSprite</para>
+		/// <para>0 - position on screen</para>
+		/// <para>1 - position on sprite</para>
 		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 2 as first parameter.
 		/// </summary>
 		public Rectangle[] OptButton {
 			get {
-				return new Rectangle[2] { menuPositions[2], menuSprites[2] };
+				return new Rectangle[2] { positions[2], sprites[2] };
 			}
 			set {
 				if( changeBTNPos && changeBTNSprite ) {
@@ -226,22 +226,22 @@ namespace MulTris {
 					throw new InvalidOperationException("You should not be able to do that operation!");
 				}
 				if( changeBTNPos )
-					menuPositions[2] = value[0];
+					positions[2] = value[0];
 				if( changeBTNSprite )
-					menuSprites[2] = value[0];
+					sprites[2] = value[0];
 			}
 		}
 
 		/// <summary>
 		/// An Exit Button Parameter.
 		/// It is an Array containing two Rectangles:
-		/// <para>0 - buttonPosition</para>
-		/// <para>1 - buttonSprite</para>
+		/// <para>0 - position on screen</para>
+		/// <para>1 - position on sprite</para>
 		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 3 as first parameter.
 		/// </summary>
 		public Rectangle[] ExitButton {
 			get {
-				return new Rectangle[2] { menuPositions[3], menuSprites[3] };
+				return new Rectangle[2] { positions[3], sprites[3] };
 			}
 			set {
 				if( changeBTNPos && changeBTNSprite ) {
@@ -250,22 +250,22 @@ namespace MulTris {
 					throw new InvalidOperationException("You should not be able to do that operation!");
 				}
 				if( changeBTNPos )
-					menuPositions[3] = value[0];
+					positions[3] = value[0];
 				if( changeBTNSprite )
-					menuSprites[3] = value[0];
+					sprites[3] = value[0];
 			}
 		}
 
 		/// <summary>
 		/// An Exit Button Parameter.
 		/// It is an Array containing two Rectangles:
-		/// <para>0 - buttonPosition</para>
-		/// <para>1 - buttonSprite</para>
+		/// <para>0 - position on screen</para>
+		/// <para>1 - position on sprite</para>
 		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 3 as first parameter.
 		/// </summary>
 		public Rectangle[] CloseWindow {
 			get {
-				return new Rectangle[2] { menuPositions[4], menuSprites[4] };
+				return new Rectangle[2] { positions[4], sprites[4] };
 			}
 			set {
 				if( changeBTNPos && changeBTNSprite ) {
@@ -274,22 +274,22 @@ namespace MulTris {
 					throw new InvalidOperationException("You should not be able to do that operation!");
 				}
 				if( changeBTNPos )
-					menuPositions[4] = value[0];
+					positions[4] = value[0];
 				if( changeBTNSprite )
-					menuSprites[4] = value[0];
+					sprites[4] = value[0];
 			}
 		}
 
 		/// <summary>
 		/// An Close CloseWindow Parameter.
 		/// It is an Array containing two Rectangles:
-		/// <para>0 - buttonPosition</para>
-		/// <para>1 - buttonSprite</para>
+		/// <para>0 - position on screen</para>
+		/// <para>1 - position on sprite</para>
 		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 3 as first parameter.
 		/// </summary>
 		public Rectangle[] CloseCloseWindow {
 			get {
-				return new Rectangle[2] { menuPositions[5], menuSprites[5] };
+				return new Rectangle[2] { positions[5], sprites[5] };
 			}
 			set {
 				if( changeBTNPos && changeBTNSprite ) {
@@ -298,22 +298,22 @@ namespace MulTris {
 					throw new InvalidOperationException("You should not be able to do that operation!");
 				}
 				if( changeBTNPos )
-					menuPositions[5] = value[0];
+					positions[5] = value[0];
 				if( changeBTNSprite )
-					menuSprites[5] = value[0];
+					sprites[5] = value[0];
 			}
 		}
 
 		/// <summary>
 		/// An Confirm CloseWindow Parameter.
 		/// It is an Array containing two Rectangles:
-		/// <para>0 - buttonPosition</para>
-		/// <para>1 - buttonSprite</para>
+		/// <para>0 - position on screen</para>
+		/// <para>1 - position on sprite</para>
 		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 3 as first parameter.
 		/// </summary>
 		public Rectangle[] ConfirmCloseButton {
 			get {
-				return new Rectangle[2] { menuPositions[6], menuSprites[6] };
+				return new Rectangle[2] { positions[6], sprites[6] };
 			}
 			set {
 				if( changeBTNPos && changeBTNSprite ) {
@@ -322,9 +322,9 @@ namespace MulTris {
 					throw new InvalidOperationException("You should not be able to do that operation!");
 				}
 				if( changeBTNPos )
-					menuPositions[6] = value[0];
+					positions[6] = value[0];
 				if( changeBTNSprite )
-					menuSprites[6] = value[0];
+					sprites[6] = value[0];
 			}
 		}
 
@@ -336,7 +336,7 @@ namespace MulTris {
 
 			// Compute CloseWindow for lower resolutions
 			int marginCW = 50;
-			int widthCW = QuickMaths._IRB(false, CloseWindow[1].Width, 0, g.WIDTH - ( 2 * marginCW ));
+			int widthCW = QuickOperations._IRB(false, CloseWindow[1].Width, 0, g.WIDTH - ( 2 * marginCW ));
 			int heightCW = widthCW * CloseWindow[1].Height / CloseWindow[1].Width;
 			int xCW = ( g.WIDTH - widthCW ) / 2;
 			int yCW = ( g.HEIGHT - heightCW ) / 2;
@@ -348,9 +348,9 @@ namespace MulTris {
 			int ycCW = yCW + heightCW - ConfirmCloseButton[1].Height - 50;
 
 			// Compute Logo for lower resolutions
-			int widthL = QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100);
-			int heightL = ( QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) * GameLogo[1].Height ) / GameLogo[1].Width;
-			int xL = ( g.WIDTH - QuickMaths._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) ) / 2;
+			int widthL = QuickOperations._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100);
+			int heightL = ( QuickOperations._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) * GameLogo[1].Height ) / GameLogo[1].Width;
+			int xL = ( g.WIDTH - QuickOperations._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) ) / 2;
 			int logo_bottom = 50 + heightL;
 
 			this.SetPositionFor(0, new Rectangle(xL, 50, widthL, heightL));         // Set position for LOGO
@@ -383,8 +383,14 @@ namespace MulTris {
 		}
 
 		public void Load(ContentManager cm) {
-			menuTexture = cm.Load<Texture2D>("MainMenu/mainMenu");
-			loaded = true;
+			try{
+				texture = cm.Load<Texture2D>("MainMenu/mainMenu");
+				this.loaded = true;
+			}
+			 catch( Exception e ) {
+				loaded = false;
+				Console.WriteLine(e);
+			}
 		}
 
 		/* THIS SOLUTION IS CPU HEAVY. USE ONLY WHEN NECESARRY
@@ -399,16 +405,16 @@ namespace MulTris {
 				if( State == MenuState.EXIT )                                                           // If MenuState.EXIT
 					opaque = 0.3f;                                                                      // Change opacity for GL/PB/OB/EB to 0.3
 
-				sb.Draw(this.menuTexture, GameLogo[0], GameLogo[1], menuColors[0] * opaque);            // Draw GameLogo
-				sb.Draw(this.menuTexture, PlayButton[0], PlayButton[1], menuColors[1] * opaque);        // Draw PlayButton
-				sb.Draw(this.menuTexture, OptButton[0], OptButton[1], menuColors[2] * opaque);          // Draw OptionButton
-				sb.Draw(this.menuTexture, ExitButton[0], ExitButton[1], menuColors[3] * opaque);        // Draw ExitButton
+				sb.Draw(this.texture, GameLogo[0], GameLogo[1], colors[0] * opaque);            // Draw GameLogo
+				sb.Draw(this.texture, PlayButton[0], PlayButton[1], colors[1] * opaque);        // Draw PlayButton
+				sb.Draw(this.texture, OptButton[0], OptButton[1], colors[2] * opaque);          // Draw OptionButton
+				sb.Draw(this.texture, ExitButton[0], ExitButton[1], colors[3] * opaque);        // Draw ExitButton
 
 				if( State == MenuState.EXIT ) {
 
-					sb.Draw(this.menuTexture, CloseWindow[0], CloseWindow[1], menuColors[4]);                   // Draw CloseWindow
-					sb.Draw(this.menuTexture, CloseCloseWindow[0], CloseCloseWindow[1], menuColors[5]);         // Draw Close CloseWindow Button
-					sb.Draw(this.menuTexture, ConfirmCloseButton[0], ConfirmCloseButton[1], menuColors[6]);     // Draw Confirm CloseWindow Button
+					sb.Draw(this.texture, CloseWindow[0], CloseWindow[1], colors[4]);                   // Draw CloseWindow
+					sb.Draw(this.texture, CloseCloseWindow[0], CloseCloseWindow[1], colors[5]);         // Draw Close CloseWindow Button
+					sb.Draw(this.texture, ConfirmCloseButton[0], ConfirmCloseButton[1], colors[6]);     // Draw Confirm CloseWindow Button
 
 					SpriteFont fira = this.game.FiraLight24;                            // Save locally font
 
@@ -420,17 +426,19 @@ namespace MulTris {
 					String yes = "Yes";                                                 // Store String to show
 					Vector2 yesPoint =                                                  // Calculate position of string
 					new Vector2(ConfirmCloseButton[0].X + ( ConfirmCloseButton[0].Width - fira.MeasureString(yes).X ) / 2, ConfirmCloseButton[0].Y + ( ConfirmCloseButton[0].Height - fira.MeasureString(yes).Y ) / 2);
-					sb.DrawString(fira, yes, yesPoint, menuColors[6]);                  // Draw string
+					sb.DrawString(fira, yes, yesPoint, colors[6]);                  // Draw string
 
 					/* THIS IS CPU HEAVY NOT OPTIMAL SOLUTION (Uses second sb.Begin(...))!
-					sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, ExitTextRaster); 
-					Rectangle tempR = sb.GraphicsDevice.ScissorRectangle;		// Save Original ScissorRect
-					sb.GraphicsDevice.ScissorRectangle = ExitTextRectangle;		// Set new ScissorRect
-					// Draw
-					sb.DrawString(this.game.FiraLight24, "Are you sure?", Vector2.Zero, Color.White);
-					// Draw
-					sb.GraphicsDevice.ScissorRectangle = tempR;					// Reset to Original ScissorRect
-					sb.End( );
+					
+						sb.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, ExitTextRaster); 
+						Rectangle tempR = sb.GraphicsDevice.ScissorRectangle;		// Save Original ScissorRect
+						sb.GraphicsDevice.ScissorRectangle = ExitTextRectangle;		// Set new ScissorRect
+						// Draw
+						sb.DrawString(this.game.FiraLight24, "Are you sure?", Vector2.Zero, Color.White);
+						// Draw
+						sb.GraphicsDevice.ScissorRectangle = tempR;					// Reset to Original ScissorRect
+						sb.End( );
+
 					*/
 				}
 			}
@@ -545,10 +553,10 @@ namespace MulTris {
 		}
 
 		~Menu() {
-			if( menuTexture != null ) {
-				menuTexture.Dispose( );
+			if( texture != null ) {
+				texture.Dispose( );
 			}
-			menuTexture = null;
+			texture = null;
 		}
 
 	}
