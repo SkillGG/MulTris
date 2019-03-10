@@ -22,6 +22,7 @@ namespace MulTris {
 		// FONTS
 		public SpriteFont FiraLight24;
 		public SpriteFont FiraLight20;
+		public SpriteFont FiraLight10;
 		// FONTS
 
 
@@ -129,6 +130,7 @@ namespace MulTris {
 
 			this.FiraLight24 = this.Content.Load<SpriteFont>("Fonts/Fira24");
 			this.FiraLight20 = this.Content.Load<SpriteFont>("Fonts/Fira20");
+			this.FiraLight10 = this.Content.Load<SpriteFont>("Fonts/Fira10");
 
 			menu.Load(this.Content);
 			selectmenu.Load(Content);
@@ -184,10 +186,21 @@ namespace MulTris {
 
 			if( this.State == GameState.MENU ) {
 				// RENDER ALL MENU SPRITES
+				this.spriteBatch.DrawString(FiraLight10, ( "M: " + this.State + " S: " + this.menu.State ), new Vector2(0, 0), Color.Yellow);
+
 				this.menu.Draw(this.spriteBatch);
 			}
-			if( this.State == GameState.SELECT )
+			if( this.State == GameState.SELECT ) {
+				this.spriteBatch.DrawString(FiraLight10, ( "M: " + this.State + " S: " + this.selectmenu.State ), new Vector2(0, 0), Color.Yellow);
+
 				this.selectmenu.Draw(spriteBatch);
+			}
+			if(this.State == GameState.OPTIONS){
+				this.spriteBatch.DrawString(FiraLight10, ( "M: " + this.State + " S: " ), new Vector2(0, 0), Color.Yellow);
+			}
+			if(this.State == GameState.GAME){
+				this.spriteBatch.DrawString(FiraLight10, ( "M: " + this.State + " S: "), new Vector2(0, 0), Color.Yellow);
+			}
 
 			// Render everything on screen
 			this.spriteBatch.End( );
