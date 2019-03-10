@@ -75,8 +75,9 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AnimatedSprite.cs" />
+    <Compile Include="QuickOperations.cs" />
     <Compile Include="InputState.cs" />
-    <Compile Include="QuickMaths.cs" />
     <Compile Include="Menu.cs" />
     <Compile Include="Multris.cs" />
     <Compile Include="Program.cs" />
