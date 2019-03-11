@@ -68,14 +68,16 @@ namespace MulTris {
 			this.graphics.ApplyChanges( );
 		}
 
-		public void InitializeGame(/*GameOption<TYPE>? NAME, ...*/){
+		public void InitializeGame(GameOption<Point> size, GameOption<bool>[] bck){
 			// INITIALIZE GAME WITH GIVEN OPTIONS
-
+			this.tetris.Initialize(size,bck);
 		}
 
 		private InputState inputs;
 
 		public Menu menu;
+
+		public Tetris tetris;
 
 		public SelectMenu selectmenu;
 
@@ -114,6 +116,8 @@ namespace MulTris {
 			this.inputs = new InputState( );
 			this.menu = new Menu(this);
 			this.selectmenu = new SelectMenu(this);
+			this.tetris = new Tetris( );
+
 
 			base.Initialize( );
 		}
@@ -132,6 +136,7 @@ namespace MulTris {
 			this.FiraLight20 = this.Content.Load<SpriteFont>("Fonts/Fira20");
 			this.FiraLight10 = this.Content.Load<SpriteFont>("Fonts/Fira10");
 
+			tetris.Load(Content);
 			menu.Load(this.Content);
 			selectmenu.Load(Content);
 
@@ -197,9 +202,12 @@ namespace MulTris {
 			}
 			if(this.State == GameState.OPTIONS){
 				this.spriteBatch.DrawString(FiraLight10, ( "M: " + this.State + " S: " ), new Vector2(0, 0), Color.Yellow);
+				// DRAW OPTIONS
 			}
 			if(this.State == GameState.GAME){
 				this.spriteBatch.DrawString(FiraLight10, ( "M: " + this.State + " S: "), new Vector2(0, 0), Color.Yellow);
+				// DRAW GAME
+				this.tetris.Draw( );
 			}
 
 			// Render everything on screen

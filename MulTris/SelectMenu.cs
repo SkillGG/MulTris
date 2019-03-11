@@ -6,17 +6,41 @@ using System;
 
 
 namespace MulTris {
-	public class GameOption<T> {
+	public class GameOption<T> where T : struct {
 		private T v;
 		private string n;
+		private T? d;
 		public string Name { get => this.n; }
 		public T Value { get => this.v; }
-		public GameOption(T o, string name) {
+		public GameOption(T o, string name, T? def) {
 			this.n = name;
 			this.v = o;
+			this.d = def;
 		}
 		public void ChangeValue(T o) {
 			this.v = o;
+		}
+		public void ChangeToDefault() {
+			this.v = this.d ?? this.v;
+		}
+	}
+
+	public class GameOption {
+		private string v;
+		private string n;
+		private string d;
+		public string Name { get => this.n; }
+		public string Value { get => this.v; }
+		public GameOption(string o, string name, string def) {
+			this.n = name;
+			this.v = o;
+			this.d = def;
+		}
+		public void ChangeValue(string o) {
+			this.v = o;
+		}
+		public void ChangeToDefault() {
+			this.v = this.d ?? this.v;
 		}
 	}
 
@@ -253,6 +277,9 @@ namespace MulTris {
 			this.MovePointerTo(0);
 			DefaultPointerPositionSpriteSize( );
 
+			// Option init
+			this.uintOptions = new GameOption<uint>[2] { new GameOption<uint>(10, "Board Width", 10), new GameOption<uint>(24, "Board Height", 24) };
+
 		}
 
 		public void Load(ContentManager cm) {
@@ -345,7 +372,9 @@ namespace MulTris {
 				if( inputs.ButtonUpAny(bef, Buttons.Back) || inputs.KeyUp(bef, Keys.Escape) )
 					this.GoBack( );
 
-
+				if( inputs.ButtonUpAny(bef, Buttons.A) || inputs.KeyUp(bef, Keys.Enter) ) {
+					this.game.InitializeGame( );
+				}
 
 			}
 
