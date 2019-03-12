@@ -71,6 +71,7 @@ namespace MulTris {
 		public void InitializeGame(GameOption<Point> size, GameOption<bool>[] bck){
 			// INITIALIZE GAME WITH GIVEN OPTIONS
 			this.tetris.Initialize(size,bck);
+			this.State = GameState.GAME;
 		}
 
 		private InputState inputs;
@@ -207,7 +208,7 @@ namespace MulTris {
 			if(this.State == GameState.GAME){
 				this.spriteBatch.DrawString(FiraLight10, ( "M: " + this.State + " S: "), new Vector2(0, 0), Color.Yellow);
 				// DRAW GAME
-				this.tetris.Draw( );
+				this.tetris.Draw(this.spriteBatch);
 			}
 
 			// Render everything on screen

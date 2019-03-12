@@ -6,58 +6,29 @@ using System;
 
 
 namespace MulTris {
-	public class GameOption<T> where T : struct {
-		private T v;
-		private string n;
-		private T? d;
-		public string Name { get => this.n; }
-		public T Value { get => this.v; }
-		public GameOption(T o, string name, T? def) {
-			this.n = name;
-			this.v = o;
-			this.d = def;
-		}
-		public void ChangeValue(T o) {
-			this.v = o;
-		}
-		public void ChangeToDefault() {
-			this.v = this.d ?? this.v;
-		}
-	}
-
-	public class GameOption {
-		private string v;
-		private string n;
-		private string d;
-		public string Name { get => this.n; }
-		public string Value { get => this.v; }
-		public GameOption(string o, string name, string def) {
-			this.n = name;
-			this.v = o;
-			this.d = def;
-		}
-		public void ChangeValue(string o) {
-			this.v = o;
-		}
-		public void ChangeToDefault() {
-			this.v = this.d ?? this.v;
-		}
-	}
 
 	public class SelectMenu {
 
 		private Multris game;
 
 
+		public enum OPTPLValues {
+			Width = 0,
+			Height = 1,
+			Play = 6,
+			B3 = 2,
+			B4 = 3,
+			B5 = 4,
+			B6 = 5
+		}
+
 		public enum SelectState {
 			TYPE,
 			OPTIONS
 		}
 
-		public GameOption<bool>[] boolOptions;
-		public GameOption<string>[] stringOptions;
-		public GameOption<uint>[] uintOptions;
-		public GameOption<int>[] intOptions;
+		public GameOption<bool>[] blockOptions;
+		public GameOption<Point> borderSizeOption;
 
 		public SelectState State = SelectState.TYPE;
 
@@ -201,6 +172,7 @@ namespace MulTris {
 		}
 
 		public Rectangle OfflineLabel;
+		public Rectangle PlayLabel;
 
 		private void SetPointerLocations(Point[] tl, Point[] ol) {
 			this.PointerOptionLocations = ol;
@@ -228,15 +200,17 @@ namespace MulTris {
 				this.SetPositionFor(0, PointerTypeLocations[PointerLocation]);
 			} else if( this.State == SelectState.OPTIONS ) {
 				switch( PointerLocation ) {
-					case 0:                     // T3 blocka
-					case 1:                     // T4 blocks
-					case 2:                     // T5 blocks
-					case 3:                     // T6 blocks
+					case 0:						// Width
+					case 1:						// Height
+					case 2:                     // T3 blocka
+					case 3:                     // T4 blocks
+					case 4:                     // T5 blocks
+					case 5:                     // T6 blocks
 						PointerLocation = (byte) ( PointerLocation + by );
 						if( PointerLocation > PointerOptionLocations.Length - 1 )
 							PointerLocation = 0;
 						break;
-					case 4:                     // Play Button
+					case 6:                     // Play Button
 						PointerLocation = 0;    // Go to first element
 						break;
 				}
@@ -263,11 +237,13 @@ namespace MulTris {
 					new Point(150, 300),
 					new Point(350, 600)
 				},
-				new Point[5] {
-					Point.Zero,
-					Point.Zero,
-					Point.Zero,
-					Point.Zero,
+				new Point[7] {
+					Point.Zero,		// Board Width
+					Point.Zero,		// Board Height
+					Point.Zero,		// B3
+					Point.Zero,		// B4
+					Point.Zero,		// B5
+					Point.Zero,		// B6
 					// Play
 					Point.Zero // Changed in Load()
 				}
@@ -278,17 +254,24 @@ namespace MulTris {
 			DefaultPointerPositionSpriteSize( );
 
 			// Option init
-			this.uintOptions = new GameOption<uint>[2] { new GameOption<uint>(10, "Board Width", 10), new GameOption<uint>(24, "Board Height", 24) };
+			this.borderSizeOption = new GameOption<Point>(new Point(10,24), GameOptionType.BS, "Board Size", new Point(10,24));
+			this.blockOptions = new GameOption<bool>[4] {
+				new GameOption<bool>(false, GameOptionType.B3, "Use 3minos", false),
+				new GameOption<bool>(true, GameOptionType.B4, "Use tetrominos", true),
+				new GameOption<bool>(false, GameOptionType.B5, "Use 5minos", false),
+				new GameOption<bool>(false, GameOptionType.B6, "Use 6minos", false)
+			};
 
 		}
 
 		public void Load(ContentManager cm) {
 			try {
 				texture = cm.Load<Texture2D>("MainMenu/selectMenu");
-				this.OfflineLabel = new Rectangle(Pointer[0].X, Pointer[0].Y, Pointer[0].Width + ( (int) this.game.FiraLight20.MeasureString("Offline").X ), Pointer[0].Height);
-
+				this.OfflineLabel = new Rectangle(PointerTypeLocations[0].X, PointerTypeLocations[0].Y, Pointer[1].Width + ( (int) this.game.FiraLight20.MeasureString("Offline").X ) + 50, Pointer[1].Height);
+				
 				// Change Play location
-				this.PointerOptionLocations[4] = new Point((int) ( ( this.game.WIDTH / 2 ) - ( this.game.FiraLight20.MeasureString("Play").X * 4 ) ), this.game.HEIGHT - 100);
+				this.PointerOptionLocations[(int) OPTPLValues.Play] = new Point((int) ( ( this.game.WIDTH / 2 ) - ( this.game.FiraLight20.MeasureString("Play").X * 4 ) ), this.game.HEIGHT - 100);
+				this.PlayLabel = new Rectangle(PointerOptionLocations[(int) OPTPLValues.Play].X, PointerOptionLocations[(int) OPTPLValues.Play].Y, Pointer[1].Width + 50 + ( (int) this.game.FiraLight20.MeasureString("Play").X ), Pointer[1].Height);
 
 				loaded = true;
 			} catch( Exception e ) {
@@ -328,8 +311,8 @@ namespace MulTris {
 						this.game.FiraLight20,
 						"Play",
 						new Vector2(
-							PointerOptionLocations[4].X + Pointer[0].Width + 50,
-							PointerOptionLocations[4].Y + ( Pointer[0].Height / 2 - this.game.FiraLight20.MeasureString("Play").Y / 2 )
+							PointerOptionLocations[(int)OPTPLValues.Play].X + Pointer[0].Width + 50,
+							PointerOptionLocations[(int) OPTPLValues.Play].Y + ( Pointer[0].Height / 2 - this.game.FiraLight20.MeasureString("Play").Y / 2 )
 						),
 						Color.White
 					);
@@ -340,7 +323,7 @@ namespace MulTris {
 		public void ShowOptions() {
 
 			this.State = SelectState.OPTIONS;
-			MovePointerTo(4);
+			MovePointerTo((int) OPTPLValues.Play);
 
 		}
 
@@ -362,7 +345,7 @@ namespace MulTris {
 				if( PointerLocation == 0 ) {
 					if( inputs.ButtonDownAny(bef, Buttons.A) || // If pushed A
 						inputs.KeyUp(bef, Keys.Enter) ||        // If clicked Enter
-						( OfflineLabel.Intersects(new Rectangle(mr.point, new Point(1))) && mr.button == MouseButton.LEFT ) ) { // If clicked LMB over Offline
+						( OfflineLabel.Intersects(inputs.MouseRectangle) && mr.button == MouseButton.LEFT ) ) { // If clicked LMB over Offline
 						this.ShowOptions( );
 					}
 				}
@@ -372,8 +355,20 @@ namespace MulTris {
 				if( inputs.ButtonUpAny(bef, Buttons.Back) || inputs.KeyUp(bef, Keys.Escape) )
 					this.GoBack( );
 
-				if( inputs.ButtonUpAny(bef, Buttons.A) || inputs.KeyUp(bef, Keys.Enter) ) {
-					this.game.InitializeGame( );
+				if( this.PointerLocation == (byte) OPTPLValues.Play ) {
+					if( inputs.ButtonUpAny(bef, Buttons.A) || inputs.KeyUp(bef, Keys.Enter) || 
+						( PlayLabel.Intersects(inputs.MouseRectangle) && mr.button == MouseButton.LEFT )
+					) {
+						this.game.InitializeGame(
+						borderSizeOption,
+						new GameOption<bool>[4] {
+							blockOptions[0],
+							blockOptions[1],
+							blockOptions[2],
+							blockOptions[3]
+							}
+						);
+					}
 				}
 
 			}
