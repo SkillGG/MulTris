@@ -33,13 +33,17 @@ namespace MulTris {
 		public SelectState State = SelectState.TYPE;
 
 		public void GoBack() {
+			new Debug("SelectMenu#GoBack", "Trying to go back one state ( " + this.State + ")");
 			if( this.State == SelectState.OPTIONS ) {
 
 				this.State = SelectState.TYPE;
 				MovePointerTo(0);
+				new Debug("SelectMenu#GoBack", "Went back to TYPE");
 
-			} else
+			} else {
 				this.game.State = Multris.GameState.MENU;
+				new Debug("SelectMenu#GoBack", "Went back to MENU");
+			}
 		}
 
 		private Texture2D texture;
@@ -115,6 +119,7 @@ namespace MulTris {
 		}
 
 		public void SetPositionFor(uint b, Nullable<Rectangle> r) {
+			new Debug("SelectMenu#SetPositionFor", "Trying to set " + b + "'s position to " + r + ".");
 			changeBTNPos = true;
 			if( b > positions.Length - 1 )
 				return;
@@ -125,6 +130,7 @@ namespace MulTris {
 					break;
 			}
 			changeBTNPos = false;
+			new Debug("SelectMenu#SetPositionFor", "Successfully changed " + b + "'s position!");
 		}
 
 		public void DefaultPointerPositionSpriteSize() {
@@ -134,17 +140,18 @@ namespace MulTris {
 		}
 
 		public void SetPositionFor(uint b, Point? p) {
+			new Debug("SelectMenu#SetPositionFor", "Trying to set " + b + "'s position to " + p + ".");
 			changeBTNPos = true;
 			if( b > positions.Length - 1 )
 				return;
 			Point sp = p ?? positions[b].Location;
-			Console.WriteLine(sp + ":Pointer[0]:" + p);
 			switch( b ) {
 				case 0:
 					Pointer = new Rectangle[2] { new Rectangle(sp, Pointer[0].Size), new Rectangle(sp, Pointer[0].Size) };
 					break;
 			}
 			changeBTNPos = false;
+			new Debug("SelectMenu#SetPositionFor", "Successfully changed " + b + "'s position!");
 		}
 
 		/// <summary>
@@ -200,8 +207,8 @@ namespace MulTris {
 				this.SetPositionFor(0, PointerTypeLocations[PointerLocation]);
 			} else if( this.State == SelectState.OPTIONS ) {
 				switch( PointerLocation ) {
-					case 0:						// Width
-					case 1:						// Height
+					case 0:                     // Width
+					case 1:                     // Height
 					case 2:                     // T3 blocka
 					case 3:                     // T4 blocks
 					case 4:                     // T5 blocks
@@ -219,6 +226,7 @@ namespace MulTris {
 		}
 
 		public void MovePointerTo(byte position) {
+			new Debug("SelectMenu#MovePointerTo", "Moving Pointer to position " + position + " (" + this.State + ")");
 			PointerLocation = position;
 			if( this.State == SelectState.TYPE )
 				this.SetPositionFor(0, PointerTypeLocations[PointerLocation]);
@@ -228,8 +236,12 @@ namespace MulTris {
 		}
 
 		public SelectMenu(Multris g) {
+			string pl = "SelectMenu#()";
+
+			new Debug(pl, "SelectMenu Initializing");
 			this.game = g;
 
+			new Debug(pl, "Setting all static Pointer positions");
 			this.SetPointerLocations(
 				new Point[3] {
 					// Offline
@@ -247,14 +259,15 @@ namespace MulTris {
 					// Play
 					Point.Zero // Changed in Load()
 				}
-
 			);
+
 
 			this.MovePointerTo(0);
 			DefaultPointerPositionSpriteSize( );
 
+			new Debug(pl, "Initializing GaemOptions.");
 			// Option init
-			this.borderSizeOption = new GameOption<Point>(new Point(10,24), GameOptionType.BS, "Board Size", new Point(10,24));
+			this.borderSizeOption = new GameOption<Point>(new Point(10, 24), GameOptionType.BS, "Board Size", new Point(10, 24));
 			this.blockOptions = new GameOption<bool>[4] {
 				new GameOption<bool>(false, GameOptionType.B3, "Use 3minos", false),
 				new GameOption<bool>(true, GameOptionType.B4, "Use tetrominos", true),
@@ -265,18 +278,25 @@ namespace MulTris {
 		}
 
 		public void Load(ContentManager cm) {
+			string pl = "SelectMenu#Load";
 			try {
+				new Debug(pl, "Loading SelectMenu");
 				texture = cm.Load<Texture2D>("MainMenu/selectMenu");
+
+				new Debug(pl, "Calculating texture-based sizes and positions.");
+
 				this.OfflineLabel = new Rectangle(PointerTypeLocations[0].X, PointerTypeLocations[0].Y, Pointer[1].Width + ( (int) this.game.FiraLight20.MeasureString("Offline").X ) + 50, Pointer[1].Height);
-				
+
 				// Change Play location
 				this.PointerOptionLocations[(int) OPTPLValues.Play] = new Point((int) ( ( this.game.WIDTH / 2 ) - ( this.game.FiraLight20.MeasureString("Play").X * 4 ) ), this.game.HEIGHT - 100);
 				this.PlayLabel = new Rectangle(PointerOptionLocations[(int) OPTPLValues.Play].X, PointerOptionLocations[(int) OPTPLValues.Play].Y, Pointer[1].Width + 50 + ( (int) this.game.FiraLight20.MeasureString("Play").X ), Pointer[1].Height);
 
+				new Debug(pl, "Loading complete!");
+
 				loaded = true;
 			} catch( Exception e ) {
 				loaded = false;
-				Console.WriteLine(e);
+				new Debug(pl, "ERR: " + e);
 			}
 		}
 
@@ -311,7 +331,7 @@ namespace MulTris {
 						this.game.FiraLight20,
 						"Play",
 						new Vector2(
-							PointerOptionLocations[(int)OPTPLValues.Play].X + Pointer[0].Width + 50,
+							PointerOptionLocations[(int) OPTPLValues.Play].X + Pointer[0].Width + 50,
 							PointerOptionLocations[(int) OPTPLValues.Play].Y + ( Pointer[0].Height / 2 - this.game.FiraLight20.MeasureString("Play").Y / 2 )
 						),
 						Color.White
@@ -322,8 +342,12 @@ namespace MulTris {
 
 		public void ShowOptions() {
 
+			new Debug("SelectMenu#ShowOptions", "Showing GameOptions.");
+
 			this.State = SelectState.OPTIONS;
 			MovePointerTo((int) OPTPLValues.Play);
+
+			new Debug("SelectMenu#ShowOptions", "State changed to OPTIONS");
 
 		}
 
@@ -356,7 +380,7 @@ namespace MulTris {
 					this.GoBack( );
 
 				if( this.PointerLocation == (byte) OPTPLValues.Play ) {
-					if( inputs.ButtonUpAny(bef, Buttons.A) || inputs.KeyUp(bef, Keys.Enter) || 
+					if( inputs.ButtonUpAny(bef, Buttons.A) || inputs.KeyUp(bef, Keys.Enter) ||
 						( PlayLabel.Intersects(inputs.MouseRectangle) && mr.button == MouseButton.LEFT )
 					) {
 						this.game.InitializeGame(

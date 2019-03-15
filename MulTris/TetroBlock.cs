@@ -35,6 +35,7 @@ namespace MulTris {
 		public TBT Type { get => type; }
 
 		public TetroBlock(TBT tp, int size) {
+			new Debug("TetroBlock#()", "TetroBlock Initialization");
 			this.type = tp;
 			this.square = size;
 		}
@@ -42,28 +43,33 @@ namespace MulTris {
 		public void Load(ContentManager cm, TetroType TetraLetter) {
 
 			try {
+				new Debug("TetroBlock#Load", "Loading TetroBlock texture via ContentManager.");
 				this.block = cm.Load<Texture2D>("Game/block" + TetraLetter.ToString( ).ToUpper( ));
 				this.source = new Rectangle(new Point(0), Size);
 				this.load = true;
 
-			} catch( Exception ) {
+			} catch( Exception e ) {
 				this.load = false;
+				new Debug("TetroBlock#Load", "ERR:" + e);
 			}
 
 		}
 
 		public void Load(Texture2D t) {
 			try {
+				new Debug("TetroBlock#Load", "Loading TetroBlock texture with Texture2D.");
 				this.block = t;
 				this.source = new Rectangle(new Point(0), Size);
 				this.load = true;
 
-			} catch( Exception ) {
+			} catch( Exception e ) {
 				this.load = false;
+				new Debug("TetroBlock#Load", "ERR:" + e);
 			}
 		}
 
 		public void Init(TetroBlock center, int xOffset, int yOffset) {
+			new Debug("TetroBlock#Init", "Initializing Offset and CenterPiece.");
 			this.offset = new Point(xOffset, yOffset);
 			this.centerPiece = center;
 			this.init = true;
@@ -95,7 +101,6 @@ namespace MulTris {
 							CenterPiece.Position.Y * CenterPiece.Side + Offset.Y * Side
 						),
 					Size);
-					Console.WriteLine("Offsetted Piece! O:{X:" + Offset.X + ",Y:" + Offset.Y + "}, R:" + pos);
 					sb.Draw(this.block, pos, source, Color.White);
 				} else {
 					//CENTER PIECE
@@ -107,6 +112,7 @@ namespace MulTris {
 		}
 
 		public void ResetOffset(int x, int y) {
+			new Debug("TetroBlock#ResetOffset", "Resetting Offset to ( " + x + ", " + y + " ).");
 			this.offset = new Point(x, y);
 		}
 

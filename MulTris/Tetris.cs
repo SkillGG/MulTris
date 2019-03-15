@@ -83,16 +83,19 @@ namespace MulTris {
 		public void Load(ContentManager cm) {
 			try {
 				// LOAD TXTs and SFXs
+				new Debug("Tetris#Load", "Loading Tetris textures");
 				this.board.Load(cm);
 				this.load = true;
 			} catch( Exception e ) {
 				this.load = false;
-				Console.Error.WriteLine(e);
+				new Debug("Tetris#Load", "ERR:" + e);
 			}
 		}
 
 		public Tetris(Multris game) {
+			new Debug("Tetris#()", "Tetris Initialization");
 			this.Game = game;
+			new Debug("Tetris#()", "Creating new Board");
 			this.board = new Board(game);
 		}
 
@@ -104,7 +107,9 @@ namespace MulTris {
 		}
 
 		public void Initialize(GameOption<Point> size, GameOption<bool>[] blocks) {
+			string pl = "Tetris#Initialize";
 			try {
+				new Debug(pl, "Initializing GameOptions for current Tetris game");
 				// INIT (Clicked PLAY)
 				if( size.Type == GameOptionType.BS )
 					this.boardSize = size;
@@ -118,11 +123,12 @@ namespace MulTris {
 					if( go.Type == GameOptionType.B6 )
 						this._6k = go;
 				}
+				new Debug(pl, "Initializing Board with given boardSize");
 				this.board.Init(this.boardSize.Value);
 				this.init = true;
 			} catch( Exception e ) {
 				this.init = false;
-				Console.Error.WriteLine(e);
+				new Debug(pl, "ERR: " + e);
 			}
 		}
 

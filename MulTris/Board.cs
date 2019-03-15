@@ -44,11 +44,12 @@ namespace MulTris {
 		public void HideGrid() { grid = false; }
 
 		public Board(Multris game) {
+			new Debug("Board#()", "Board Initialization");
 			this.Game = game;
 		}
 
 		public void Init(Point bs) {
-			Console.WriteLine("(Board) Init Start!");
+			new Debug("Board#Init", "Initialization with GameOptions");
 			try {
 				this.size = bs;
 				this.tetrominoes = new List<Tetromino>( );
@@ -56,18 +57,19 @@ namespace MulTris {
 				this.init = true;
 			} catch( Exception e ) {
 				this.init = false;
-				Console.Error.WriteLine("Wystąpił error inicjalizacji!: " + e);
+				new Debug("Board#Init", "ERR: " + e);
 			}
 		}
 
 		public void Load(ContentManager cm) {
 			try {
+				new Debug("Board#Load", "Loading Board textures");
 				this.boardTXT = cm.Load<Texture2D>("Game/Board");
 				this.zTXT = cm.Load<Texture2D>("Game/blockZ");
 				load = true;
 			} catch( Exception e ) {
 				load = false;
-				Console.Error.WriteLine(e);
+				new Debug("Board#Load", "ERR: " + e);
 			}
 		}
 
@@ -80,9 +82,7 @@ namespace MulTris {
 				if( grid ) {
 
 				}
-			} else {
-				Console.Error.WriteLine("(Board) Not Init/Load yet!");
-			}
+			} 
 		}
 
 		public void Update() {
@@ -93,11 +93,15 @@ namespace MulTris {
 
 		public void AddTetromino(TetroType t) {
 
+			new Debug("Board#AddTetromino", "Adding new Tetromino!");
+
 			var nt = new Tetromino(t) {
 				Fall = true
 			};
 
 			nt.MoveTo((int) ( this.Size.X / 2 ));
+
+			new Debug("Board#AddTetromino", "Centering new Tetromino.");
 
 			switch( t ) {
 				case TetroType.Z:
@@ -109,7 +113,7 @@ namespace MulTris {
 			}
 
 			this.tetrominoes.Add(nt);
-			Console.WriteLine("New Tetromino added! #{0}", tetrominoes.Count);
+			new Debug("Board#AddTetromino", "Added new Tetromino #" + tetrominoes.Count);
 		}
 
 		public void FixedUpdateS() {

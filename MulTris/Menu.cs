@@ -17,7 +17,7 @@ namespace MulTris {
 
 		public MenuState State { set; get; } = MenuState.NORMAL;
 
-		private void ExitConfirm() { this.State = MenuState.EXIT; }
+		private void ExitConfirm() { new Debug("Menu#ExitConfirm", "State of menu changed to EXIT. (Showing exit confiramtion window)"); this.State = MenuState.EXIT; }
 
 		private Texture2D texture;
 
@@ -130,6 +130,7 @@ namespace MulTris {
 		}
 
 		public void SetPositionFor(uint b, Nullable<Rectangle> r) {
+			new Debug("Menu#SetPositionFor", "Trying to set " + b + "'s position to " + r + ".");
 			changeBTNPos = true;
 			if( b > positions.Length - 1 )
 				return;
@@ -158,6 +159,7 @@ namespace MulTris {
 					break;
 			}
 			changeBTNPos = false;
+			new Debug("Menu#SetPositionFor", "Successfully changed " + b + "'s position!");
 		}
 
 		/// <summary>
@@ -330,11 +332,16 @@ namespace MulTris {
 
 		public Menu(Multris g) {
 
+			string pl = "Menu#()";
+
+			new Debug(pl, "Menu Initialization");
+
 			this.game = g;
 
 			// Compute sprite scales for lower resolutions!
 
 			// Compute CloseWindow for lower resolutions
+			new Debug(pl, "Doing graphics calculations");
 			int marginCW = 50;
 			int widthCW = QuickOperations._IRB(false, CloseWindow[1].Width, 0, g.WIDTH - ( 2 * marginCW ));
 			int heightCW = widthCW * CloseWindow[1].Height / CloseWindow[1].Width;
@@ -353,6 +360,8 @@ namespace MulTris {
 			int xL = ( g.WIDTH - QuickOperations._IRB(true, GameLogo[1].Width, 0, g.WIDTH - 100) ) / 2;
 			int logo_bottom = 50 + heightL;
 
+
+			new Debug(pl, "Changing positions of menu elements." );
 			this.SetPositionFor(0, new Rectangle(xL, 50, widthL, heightL));         // Set position for LOGO
 			this.SetPositionFor(1, new Rectangle(                                   // Set position for PlayButton
 				( g.WIDTH - PlayButton[1].Width ) / 2,                              // Middle of Window
@@ -383,13 +392,14 @@ namespace MulTris {
 		}
 
 		public void Load(ContentManager cm) {
-			try{
+			try {
+				new Debug("Menu#Load", "Loading 'MainMenu/mainMenu' texture" );
 				texture = cm.Load<Texture2D>("MainMenu/mainMenu");
+				new Debug("Menu#Load", "Loaded successfully");
 				this.loaded = true;
-			}
-			 catch( Exception e ) {
+			} catch( Exception e ) {
 				loaded = false;
-				Console.WriteLine(e);
+				new Debug("Menu#Load", "ERR: " + e);
 			}
 		}
 

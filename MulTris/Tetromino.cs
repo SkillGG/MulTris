@@ -200,7 +200,7 @@ namespace MulTris {
 		}
 
 		public void Load(ContentManager cm) {
-
+			new Debug("Tetromino#Load", "Loading TetroBlocks via ContentManager");
 			foreach( TetroBlock t in tblocks ) {
 				t.Load(cm, this.Type);
 			}
@@ -208,6 +208,7 @@ namespace MulTris {
 		}
 
 		public void Load(Texture2D txt) {
+			new Debug("Tetromino#Load", "Loading TetroBlocks with Texture2D");
 			foreach( TetroBlock t in tblocks ) {
 				t.Load(txt);
 			}
@@ -234,10 +235,13 @@ namespace MulTris {
 		private readonly byte maxRot = 3;
 
 		public Tetromino(TetroType t) {
+			new Debug("Tetromino#()", "Tetromino(" + t + ") Initialization");
 			this.falling = true;
 			this.Type = t;
 
 			Point[] rBl = GetRotationOffsetsFor(t, 0);
+
+			new Debug("Tetromino#()", "Setting proper offsets for given TetroType(" + t + ").");
 
 			tblocks[0].Init(null, 0, 0);
 			tblocks[1].Init(tblocks[0], rBl[0].X, rBl[0].Y);
@@ -246,7 +250,7 @@ namespace MulTris {
 		}
 
 		public void RotateLeft() {
-
+			new Debug("Tetromino#RotateLeft", "Rotating Left");
 			rotateState = QuickOperations._IRB(true, rotateState, minRot, maxRot);
 			if( rotateState != 0 )
 				rotateState--;
@@ -267,7 +271,7 @@ namespace MulTris {
 				toGround--;
 				tblocks[0].MoveBy(0, 1);
 			} else
-				Console.WriteLine("Dude. Imma on ground!");
+				new Debug("Tetromino#Gravity", "Tetromino's already on ground!");
 		}
 
 	}
