@@ -5,7 +5,7 @@ using System;
 
 namespace MulTris {
 
-	public enum GameOptionType{
+	public enum GameOptionType {
 		B3,
 		B4,
 		B5,
@@ -15,9 +15,9 @@ namespace MulTris {
 
 	public class GameOption<T> where T : struct {
 		private T v;
-		private string n;
-		private T? d;
-		private GameOptionType type;
+		private readonly string n;
+		private readonly T? d;
+		private readonly GameOptionType type;
 
 		public string Name { get => this.n; }
 		public T Value { get => this.v; }
@@ -39,9 +39,9 @@ namespace MulTris {
 
 	public class GameOption {
 		private string v;
-		private string n;
-		private string d;
-		private GameOptionType type;
+		private readonly string n;
+		private readonly string d;
+		private readonly GameOptionType type;
 
 		public string Name { get => this.n; }
 		public string Value { get => this.v; }
@@ -63,7 +63,7 @@ namespace MulTris {
 
 	public class Tetris {
 
-
+		private Multris Game;
 
 		private GameOption<Point> boardSize;
 		private GameOption<bool> _3k;
@@ -80,24 +80,35 @@ namespace MulTris {
 			get { return new GameOption<bool>[4] { _3k, _4k, _5k, _6k }; }
 		}
 
-		public void Load(ContentManager cm){
+		public void Load(ContentManager cm) {
 			try {
 				// LOAD TXTs and SFXs
+				this.board.Load(cm);
 				this.load = true;
-			}catch(Exception)
-			{
+			} catch( Exception e ) {
 				this.load = false;
+				Console.Error.WriteLine(e);
 			}
 		}
 
-		public Tetris() { }
+		public Tetris(Multris game) {
+			this.Game = game;
+			this.board = new Board(game);
+		}
+
+		public Board board;
+
+		public void FixedUpdateS() {
+			if( init )
+				this.board.FixedUpdateS( );
+		}
 
 		public void Initialize(GameOption<Point> size, GameOption<bool>[] blocks) {
 			try {
 				// INIT (Clicked PLAY)
 				if( size.Type == GameOptionType.BS )
 					this.boardSize = size;
-				foreach(GameOption<bool> go in blocks){
+				foreach( GameOption<bool> go in blocks ) {
 					if( go.Type == GameOptionType.B3 )
 						this._3k = go;
 					if( go.Type == GameOptionType.B4 )
@@ -107,26 +118,29 @@ namespace MulTris {
 					if( go.Type == GameOptionType.B6 )
 						this._6k = go;
 				}
+				this.board.Init(this.boardSize.Value);
 				this.init = true;
-			}catch(Exception){
+			} catch( Exception e ) {
 				this.init = false;
+				Console.Error.WriteLine(e);
 			}
 		}
 
 		public void Draw(SpriteBatch sb) {
-			if(init && load){
+			if( init && load ) {
 				// DRAW
-
+				this.board.Draw(sb);
 			}
 		}
 
-		public void Update(){
-			if(init){
+		public void Update(InputState bef) {
+			if( init ) {
 				// UPDATE
+				this.board.Update( );
 			}
 		}
 
-		~Tetris(){
+		~Tetris() {
 
 		}
 

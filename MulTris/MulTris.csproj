@@ -76,6 +76,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AnimatedSprite.cs" />
+    <Compile Include="Board.cs" />
+    <Compile Include="BoardTile.cs" />
     <Compile Include="QuickOperations.cs" />
     <Compile Include="InputState.cs" />
     <Compile Include="Menu.cs" />
@@ -84,7 +86,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectMenu.cs" />
     <Compile Include="Tetris.cs" />
-    <Compile Include="Tile.cs" />
+    <Compile Include="TetroBlock.cs" />
+    <Compile Include="Tetromino.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
