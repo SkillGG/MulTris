@@ -25,7 +25,7 @@ namespace MulTris {
 		private Rectangle source;
 
 		private int x, y;
-		public Point position { get => new Point(x, y); }
+		public Point Position { get => new Point(x, y); }
 
 		private int square;
 		public int Side { get => square; }
@@ -88,14 +88,26 @@ namespace MulTris {
 			if( load && init ) {
 				if( centerPiece != null ) {
 					// OFFSET PIECE
-
+					Rectangle pos =
+					new Rectangle(
+						new Point(
+							CenterPiece.Position.X * CenterPiece.Side + Offset.X * Side,
+							CenterPiece.Position.Y * CenterPiece.Side + Offset.Y * Side
+						),
+					Size);
+					Console.WriteLine("Offsetted Piece! O:{X:" + Offset.X + ",Y:" + Offset.Y + "}, R:" + pos);
+					sb.Draw(this.block, pos, source, Color.White);
 				} else {
 					//CENTER PIECE
-					Rectangle pos = new Rectangle(new Point(position.X * square, position.Y * square), Size);
-					sb.Draw(this.block, pos, source, Color.White);
+					Rectangle pos = new Rectangle(new Point(Position.X * square, Position.Y * square), Size);
+					sb.Draw(this.block, pos, source, new Color(255, 255, 255) * 0.5f);
 				}
 			}
 
+		}
+
+		public void ResetOffset(int x, int y) {
+			this.offset = new Point(x, y);
 		}
 
 	}

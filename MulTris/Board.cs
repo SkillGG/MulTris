@@ -56,7 +56,7 @@ namespace MulTris {
 				this.init = true;
 			} catch( Exception e ) {
 				this.init = false;
-				Console.Error.WriteLine(e.Message);
+				Console.Error.WriteLine("Wystąpił error inicjalizacji!: " + e);
 			}
 		}
 
@@ -74,8 +74,11 @@ namespace MulTris {
 		public void Draw(SpriteBatch sb) {
 			if( init && load ) {
 				// Draw
+				foreach( Tetromino t in tetrominoes ) {
+					t.Draw(sb);
+				}
 				if( grid ) {
-					
+
 				}
 			} else {
 				Console.Error.WriteLine("(Board) Not Init/Load yet!");
@@ -88,11 +91,13 @@ namespace MulTris {
 			}
 		}
 
-		public void AddTetromino(TetroType t){
+		public void AddTetromino(TetroType t) {
 
 			var nt = new Tetromino(t) {
 				Fall = true
 			};
+
+			nt.MoveTo((int) ( this.Size.X / 2 ));
 
 			switch( t ) {
 				case TetroType.Z:
@@ -107,20 +112,20 @@ namespace MulTris {
 			Console.WriteLine("New Tetromino added! #{0}", tetrominoes.Count);
 		}
 
-		public void FixedUpdateS(){
+		public void FixedUpdateS() {
+			if( init && load ) {
+				// Every second
 
-			// Every second
+				Tetromino lastTetro = tetrominoes.Last( );
 
-			Tetromino lastTetro = tetrominoes.Last( );
+				if( !lastTetro.Fall ) {
+					AddTetromino(TetroType.Z);
+					return;
+				} else {
+					lastTetro.Gravity( );
+				}
 
-			if(!lastTetro.Fall){
-				AddTetromino(TetroType.Z);
-				return;
 			}
-			else{
-				lastTetro.Gravity( );
-			}
-
 		}
 
 	}

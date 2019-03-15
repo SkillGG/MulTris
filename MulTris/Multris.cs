@@ -81,8 +81,11 @@ namespace MulTris {
 		*/
 
 		public Multris() {
+
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
+
+			Console.WriteLine("");
 
 			// Show the mouse
 			this.IsMouseVisible = true;
@@ -315,6 +318,10 @@ namespace MulTris {
 			thread = null;
 			futim.Dispose( );
 			futim = null;
+			sectim.Dispose( );
+			sectim = null;
+			Dispose(false);
+			return;
 		}
 	}
 }

@@ -140,9 +140,5 @@ namespace MulTris {
 			}
 		}
 
-		~Tetris() {
-
-		}
-
 	}
 }
