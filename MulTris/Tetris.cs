@@ -142,7 +142,7 @@ namespace MulTris {
 		public void Update(InputState bef) {
 			if( init ) {
 				// UPDATE
-				this.board.Update( );
+				this.board.Update(bef);
 			}
 		}
 

@@ -77,17 +77,24 @@ namespace MulTris {
 			if( init && load ) {
 				// Draw
 				foreach( Tetromino t in tetrominoes ) {
-					t.Draw(sb);
+					t.Draw(sb, this.Game);
 				}
 				if( grid ) {
 
 				}
-			} 
+			}
 		}
 
-		public void Update() {
+		public void Update(InputState bef) {
 			if( init ) {
+				Tetromino lastTetro = tetrominoes.Last( );
 
+				if( !lastTetro.Fall ) {
+					AddTetromino(TetroType.Z);
+					return;
+				} else {
+					lastTetro.Update(bef);
+				}
 			}
 		}
 

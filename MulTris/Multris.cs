@@ -11,7 +11,7 @@ namespace MulTris {
 			//Console.WriteLine("( " + invoker + " ) " + msg.ToString( ));
 		}
 		public Debug(string invoker, string msg) {
-			//Console.WriteLine("( " + invoker + " ) " + msg);
+			Console.WriteLine("( " + invoker + " ) " + msg);
 		}
 	}
 
@@ -355,15 +355,15 @@ namespace MulTris {
 
 		/* TIMER FUNCTIONS */
 
-		~Multris() {
+		/*~Multris() {
+			Dispose(false);
 			thread.Abort( );
 			thread = null;
 			futim.Dispose( );
 			futim = null;
 			sectim.Dispose( );
 			sectim = null;
-			Dispose(false);
 			return;
-		}
+		}*/
 	}
 }

@@ -10,7 +10,7 @@ namespace MulTris {
 		Side
 	}
 
-	class TetroBlock {
+	public class TetroBlock {
 
 		private bool load = false;
 		private bool init = false;
@@ -89,7 +89,7 @@ namespace MulTris {
 			}
 		}
 
-		public void Draw(SpriteBatch sb) {
+		public void Draw(SpriteBatch sb, byte Rotate, Multris m) {
 
 			if( load && init ) {
 				if( centerPiece != null ) {
@@ -102,10 +102,12 @@ namespace MulTris {
 						),
 					Size);
 					sb.Draw(this.block, pos, source, Color.White);
+					sb.DrawString(m.FiraLight10, "O" + Offset.X + ":" + Offset.Y, new Vector2(pos.X + 5, pos.Y + 5), Color.White);
 				} else {
 					//CENTER PIECE
 					Rectangle pos = new Rectangle(new Point(Position.X * square, Position.Y * square), Size);
 					sb.Draw(this.block, pos, source, new Color(255, 255, 255) * 0.5f);
+					sb.DrawString(m.FiraLight10, "R" + Rotate.ToString( ), new Vector2(pos.X + 5, pos.Y + 5), Color.White);
 				}
 			}
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using System;
+using Microsoft.Xna.Framework.Input;
 
 namespace MulTris {
 	public enum TetroType {
@@ -17,9 +17,7 @@ namespace MulTris {
 
 		private bool falling;
 		private uint toGround = 10;
-		public bool Fall { get => falling; set => falling = value; }
-
-		public TetroType Type;
+		private TetroType type;
 
 		private TetroBlock[] tblocks = new TetroBlock[4]{
 			new TetroBlock(TBT.Center, 50),
@@ -28,6 +26,10 @@ namespace MulTris {
 			new TetroBlock(TBT.Side, 50)
 		};
 
+		public TetroType Type { get => type; }
+		public bool Fall { get => falling; set => falling = value; }
+		public TetroBlock CenterBlock { get => tblocks[0]; }
+		public byte Rotation { get => rotateState; }
 		public Point[] GetRotationOffsetsFor(TetroType t, byte rotS) {
 
 			Point[] ret = new Point[3];
@@ -36,20 +38,23 @@ namespace MulTris {
 				// TODO: Rotations
 				case TetroType.Z:
 					switch( rotS ) {
+						// One Clockwise(right)
 						case 1:
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
+							ret[0] = new Point(0, -1);
+							ret[1] = new Point(-1, 0);
+							ret[2] = new Point(-1, 1);
 							break;
+						// Two
 						case 2:
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
+							ret[0] = new Point(1, 0);
+							ret[1] = new Point(0, -1);
+							ret[2] = new Point(-1, -1);
 							break;
+						// One Counter-clockwise (3x clockwise)
 						case 3:
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
+							ret[0] = new Point(0, 1);
+							ret[1] = new Point(1, 0);
+							ret[2] = new Point(1, -1);
 							break;
 						default:
 							// 0 or 3+
@@ -199,10 +204,29 @@ namespace MulTris {
 			return ret;
 		}
 
+		public void Update(InputState bef) {
+
+			InputState inputs = new InputState( );
+
+			if( inputs.KeyUp(bef, Keys.Up) ) {
+				RotateRight( );
+			}
+			if( inputs.KeyUp(bef, Keys.Right) ) {
+				MoveBy(1);
+			}
+			if( inputs.KeyUp(bef, Keys.Left) ) {
+				MoveBy(-1);
+			}
+			if(inputs.KeyUp(bef, Keys.Down)){
+				Gravity( );
+			}
+
+		}
+
 		public void Load(ContentManager cm) {
 			new Debug("Tetromino#Load", "Loading TetroBlocks via ContentManager");
 			foreach( TetroBlock t in tblocks ) {
-				t.Load(cm, this.Type);
+				t.Load(cm, this.type);
 			}
 
 		}
@@ -214,10 +238,10 @@ namespace MulTris {
 			}
 		}
 
-		public void Draw(SpriteBatch sb) {
+		public void Draw(SpriteBatch sb, Multris m) {
 
 			foreach( TetroBlock t in tblocks ) {
-				t.Draw(sb);
+				t.Draw(sb, this.rotateState, m);
 			}
 
 		}
@@ -237,9 +261,9 @@ namespace MulTris {
 		public Tetromino(TetroType t) {
 			new Debug("Tetromino#()", "Tetromino(" + t + ") Initialization");
 			this.falling = true;
-			this.Type = t;
+			this.type = t;
 
-			Point[] rBl = GetRotationOffsetsFor(t, 0);
+			Point[] rBl = GetRotationOffsetsFor(t, rotateState);
 
 			new Debug("Tetromino#()", "Setting proper offsets for given TetroType(" + t + ").");
 
@@ -256,12 +280,25 @@ namespace MulTris {
 				rotateState--;
 			else
 				rotateState = 3;
+			SaveRotate( );
+		}
 
-			Point[] rbl = GetRotationOffsetsFor(this.Type, rotateState);
+		public void SaveRotate() {
+			Point[] rbl = GetRotationOffsetsFor(this.type, rotateState);
 			tblocks[0].ResetOffset(0, 0);
 			tblocks[1].ResetOffset(rbl[0].X, rbl[0].Y);
 			tblocks[2].ResetOffset(rbl[1].X, rbl[1].Y);
-			tblocks[3].ResetOffset(rbl[3].X, rbl[2].Y);
+			tblocks[3].ResetOffset(rbl[2].X, rbl[2].Y);
+		}
+
+		public void RotateRight() {
+			new Debug("Tetromino#RotateLeft", "Rotating Right");
+			rotateState = QuickOperations._IRB(true, rotateState, minRot, maxRot);
+			if( rotateState < 3 )
+				rotateState++;
+			else
+				rotateState = 0;
+			SaveRotate( );
 		}
 
 		public void Gravity() {
@@ -270,6 +307,7 @@ namespace MulTris {
 			if( falling ) {
 				toGround--;
 				tblocks[0].MoveBy(0, 1);
+				//RotateRight( );
 			} else
 				new Debug("Tetromino#Gravity", "Tetromino's already on ground!");
 		}
