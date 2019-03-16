@@ -14,6 +14,10 @@ namespace MulTris {
 	}
 
 	public class GameOption<T> where T : struct {
+		public override string ToString() {
+			return "GameOption<" + typeof(T).Name + ">(" + type + ") " + n + " : " + v.ToString( );
+		}
+
 		private T v;
 		private readonly string n;
 		private readonly T? d;
@@ -38,6 +42,10 @@ namespace MulTris {
 	}
 
 	public class GameOption {
+		public override string ToString() {
+			return "GameOption<String>(" + type + ") " + n + " : " + v.ToString( );
+		}
+
 		private string v;
 		private readonly string n;
 		private readonly string d;

@@ -268,9 +268,10 @@ namespace MulTris {
 
 		public void InitializeGame(GameOption<Point> size, GameOption<bool>[] bck) {
 			// INITIALIZE GAME WITH GIVEN OPTIONS
+			new Debug("Multris#InitializeGame", "Initializing new Tetris game with: " + size + ", [" + string.Join(", ", (object[]) bck) + "]");
 			this.tetris.Initialize(size, bck);
 			this.State = GameState.GAME;
-			new Debug("Multris#InitializeGame", "New Tetris Game has been initialized with: " + size + ", " + bck);
+			new Debug("Multris#InitializeGame", "New Tetris Game has been initialized with: " + size + ", [" + string.Join(", ", (object[]) bck) + "]");
 		}
 
 		public void Terminate() {
@@ -319,7 +320,7 @@ namespace MulTris {
 
 		private void STF() {
 			try {
-				new Debug("Multris#STF:2", "Initializing timers." );
+				new Debug("Multris#STF:2", "Initializing timers.");
 				futim = new Timer(FixedUpdate, null, 0, (int) Rate);
 				sectim = new Timer(FixedUpdateS, null, 0, 1000);
 			} catch( Exception ) {

@@ -31,6 +31,10 @@ namespace MulTris {
 		public int Side { get => square; }
 		public Point Size { get => new Point(square); }
 
+		public void SetSize(int side) {
+			square = side;
+		}
+
 		private TBT type;
 		public TBT Type { get => type; }
 

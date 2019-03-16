@@ -43,6 +43,14 @@ namespace MulTris {
 		public void ShowGrid() { grid = true; }
 		public void HideGrid() { grid = false; }
 
+		public int GridSize {
+			get {
+				int ret = QuickOperations.InRangeBoundInclusive(Game.HEIGHT / size.Y, 0, 50);
+				new Debug("Board#GridSize.get", "Grid Size calculated to be: " + ( Game.HEIGHT / size.Y ) + " (Bound to: " + ret + ")");
+				return ret;
+			}
+		}
+
 		public Board(Multris game) {
 			new Debug("Board#()", "Board Initialization");
 			this.Game = game;
@@ -102,7 +110,7 @@ namespace MulTris {
 
 			new Debug("Board#AddTetromino", "Adding new Tetromino!");
 
-			var nt = new Tetromino(t) {
+			var nt = new Tetromino(t, this) {
 				Fall = true
 			};
 

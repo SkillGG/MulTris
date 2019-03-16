@@ -258,7 +258,9 @@ namespace MulTris {
 		private readonly byte minRot = 0;
 		private readonly byte maxRot = 3;
 
-		public Tetromino(TetroType t) {
+		private int BlockSize;
+
+		public Tetromino(TetroType t, Board board) {
 			new Debug("Tetromino#()", "Tetromino(" + t + ") Initialization");
 			this.falling = true;
 			this.type = t;
@@ -267,10 +269,17 @@ namespace MulTris {
 
 			new Debug("Tetromino#()", "Setting proper offsets for given TetroType(" + t + ").");
 
+			this.BlockSize = board.GridSize;
+
 			tblocks[0].Init(null, 0, 0);
 			tblocks[1].Init(tblocks[0], rBl[0].X, rBl[0].Y);
 			tblocks[2].Init(tblocks[0], rBl[1].X, rBl[1].Y);
 			tblocks[3].Init(tblocks[0], rBl[2].X, rBl[2].Y);
+
+			//foreach(TetroBlock tb in tblocks){
+			//	tb.SetSize(BlockSize);
+			//}
+
 		}
 
 		public void RotateLeft() {
