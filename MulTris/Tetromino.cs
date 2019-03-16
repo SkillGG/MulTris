@@ -223,6 +223,10 @@ namespace MulTris {
 
 		}
 
+		public void ToggleDebug(){
+			this.CenterBlock.DebugInfo = !CenterBlock.DebugInfo;
+		}
+
 		public void Load(ContentManager cm) {
 			new Debug("Tetromino#Load", "Loading TetroBlocks via ContentManager");
 			foreach( TetroBlock t in tblocks ) {
@@ -276,9 +280,9 @@ namespace MulTris {
 			tblocks[2].Init(tblocks[0], rBl[1].X, rBl[1].Y);
 			tblocks[3].Init(tblocks[0], rBl[2].X, rBl[2].Y);
 
-			//foreach(TetroBlock tb in tblocks){
-			//	tb.SetSize(BlockSize);
-			//}
+			foreach(TetroBlock tb in tblocks){
+				tb.SetSize(BlockSize);
+			}
 
 		}
 

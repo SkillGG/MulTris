@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
-using System;
+using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -63,7 +63,7 @@ namespace MulTris {
 				this.tetrominoes = new List<Tetromino>( );
 				AddTetromino(TetroType.Z);
 				this.init = true;
-			} catch( Exception e ) {
+			} catch( System.Exception e ) {
 				this.init = false;
 				new Debug("Board#Init", "ERR: " + e);
 			}
@@ -75,7 +75,7 @@ namespace MulTris {
 				this.boardTXT = cm.Load<Texture2D>("Game/Board");
 				this.zTXT = cm.Load<Texture2D>("Game/blockZ");
 				load = true;
-			} catch( Exception e ) {
+			} catch( System.Exception e ) {
 				load = false;
 				new Debug("Board#Load", "ERR: " + e);
 			}
@@ -97,6 +97,14 @@ namespace MulTris {
 			if( init ) {
 				Tetromino lastTetro = tetrominoes.Last( );
 
+				InputState inputs = new InputState( );
+
+				if( inputs.KeyUp(bef, Keys.F3) ) {
+					foreach( Tetromino t in tetrominoes ) {
+						t.ToggleDebug( );
+					}
+				}
+
 				if( !lastTetro.Fall ) {
 					AddTetromino(TetroType.Z);
 					return;
@@ -117,6 +125,12 @@ namespace MulTris {
 			nt.MoveTo((int) ( this.Size.X / 2 ));
 
 			new Debug("Board#AddTetromino", "Centering new Tetromino.");
+			
+			
+			Tetromino lt = null;
+			if( tetrominoes.Count != 0 )
+				lt = tetrominoes[tetrominoes.Count - 1];
+
 
 			switch( t ) {
 				case TetroType.Z:
@@ -125,6 +139,10 @@ namespace MulTris {
 				default:
 					nt.Load(this.Game.Content);
 					break;
+			}
+
+			if( lt != null ) {
+				nt.CenterBlock.DebugInfo = lt.CenterBlock.DebugInfo;
 			}
 
 			this.tetrominoes.Add(nt);

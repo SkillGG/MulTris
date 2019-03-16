@@ -265,9 +265,9 @@ namespace MulTris {
 			this.MovePointerTo(0);
 			DefaultPointerPositionSpriteSize( );
 
-			new Debug(pl, "Initializing GaemOptions.");
+			new Debug(pl, "Initializing GameOptions.");
 			// Option init
-			this.borderSizeOption = new GameOption<Point>(new Point(10, 10), GameOptionType.BS, "Board Size", new Point(10, 24));
+			this.borderSizeOption = new GameOption<Point>(new Point(10, 24), GameOptionType.BS, "Board Size", new Point(10, 24));
 			this.blockOptions = new GameOption<bool>[4] {
 				new GameOption<bool>(false, GameOptionType.B3, "Use 3minos", false),
 				new GameOption<bool>(true, GameOptionType.B4, "Use tetrominos", true),

@@ -93,6 +93,8 @@ namespace MulTris {
 			}
 		}
 
+		public bool DebugInfo = false;
+
 		public void Draw(SpriteBatch sb, byte Rotate, Multris m) {
 
 			if( load && init ) {
@@ -106,12 +108,14 @@ namespace MulTris {
 						),
 					Size);
 					sb.Draw(this.block, pos, source, Color.White);
-					sb.DrawString(m.FiraLight10, "O" + Offset.X + ":" + Offset.Y, new Vector2(pos.X + 5, pos.Y + 5), Color.White);
+					if(centerPiece.DebugInfo)
+						sb.DrawString(m.FiraLight10, "O" + Offset.X + ":" + Offset.Y, new Vector2(pos.X + 5, pos.Y + 5), Color.White);
 				} else {
 					//CENTER PIECE
 					Rectangle pos = new Rectangle(new Point(Position.X * square, Position.Y * square), Size);
 					sb.Draw(this.block, pos, source, new Color(255, 255, 255) * 0.5f);
-					sb.DrawString(m.FiraLight10, "R" + Rotate.ToString( ), new Vector2(pos.X + 5, pos.Y + 5), Color.White);
+					if(this.DebugInfo)
+						sb.DrawString(m.FiraLight10, "R" + Rotate.ToString( ), new Vector2(pos.X + 5, pos.Y + 5), Color.Red);
 				}
 			}
 
