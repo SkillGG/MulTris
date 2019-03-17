@@ -17,7 +17,7 @@ namespace MulTris {
 
 		// Textures and SR/PR
 		private Texture2D boardTXT;
-		private Texture2D zTXT;
+		private Texture2D blockTXT;
 
 		private enum TxtIndexes {
 			NONE = -1
@@ -73,7 +73,7 @@ namespace MulTris {
 			try {
 				new Debug("Board#Load", "Loading Board textures");
 				this.boardTXT = cm.Load<Texture2D>("Game/Board");
-				this.zTXT = cm.Load<Texture2D>("Game/blockZ");
+				this.blockTXT = cm.Load<Texture2D>("Game/blocks");
 				load = true;
 			} catch( System.Exception e ) {
 				load = false;
@@ -86,9 +86,6 @@ namespace MulTris {
 				// Draw
 				foreach( Tetromino t in tetrominoes ) {
 					t.Draw(sb, this.Game);
-				}
-				if( grid ) {
-
 				}
 			}
 		}
@@ -134,7 +131,7 @@ namespace MulTris {
 
 			switch( t ) {
 				case TetroType.Z:
-					nt.Load(zTXT);
+					nt.Load(blockTXT);
 					break;
 				default:
 					nt.Load(this.Game.Content);
@@ -152,7 +149,7 @@ namespace MulTris {
 		public void FixedUpdateS() {
 			if( init && load ) {
 				// Every second
-
+				new Debug("Board#FixedUpdateS", $"1s passed!");
 				Tetromino lastTetro = tetrominoes.Last( );
 
 				if( !lastTetro.Fall ) {

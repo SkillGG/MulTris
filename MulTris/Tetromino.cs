@@ -5,12 +5,12 @@ using Microsoft.Xna.Framework.Input;
 
 namespace MulTris {
 	public enum TetroType {
-		Z,
-		S,
-		I,
-		L,
-		J,
-		O
+		Z = 0,
+		S = 1,
+		I = 2,
+		L = 3,
+		J = 4,
+		O = 5
 	}
 
 	public class Tetromino {
@@ -217,13 +217,13 @@ namespace MulTris {
 			if( inputs.KeyUp(bef, Keys.Left) ) {
 				MoveBy(-1);
 			}
-			if(inputs.KeyUp(bef, Keys.Down)){
+			if( inputs.KeyUp(bef, Keys.Down) ) {
 				Gravity( );
 			}
 
 		}
 
-		public void ToggleDebug(){
+		public void ToggleDebug() {
 			this.CenterBlock.DebugInfo = !CenterBlock.DebugInfo;
 		}
 
@@ -232,13 +232,12 @@ namespace MulTris {
 			foreach( TetroBlock t in tblocks ) {
 				t.Load(cm, this.type);
 			}
-
 		}
 
-		public void Load(Texture2D txt) {
+		public void Load(Texture2D txt, Rectangle? source = null) {
 			new Debug("Tetromino#Load", "Loading TetroBlocks with Texture2D");
 			foreach( TetroBlock t in tblocks ) {
-				t.Load(txt);
+				t.Load(new Sprite(txt, source ?? new Rectangle(0, 0, 50, 50)));
 			}
 		}
 
@@ -280,7 +279,7 @@ namespace MulTris {
 			tblocks[2].Init(tblocks[0], rBl[1].X, rBl[1].Y);
 			tblocks[3].Init(tblocks[0], rBl[2].X, rBl[2].Y);
 
-			foreach(TetroBlock tb in tblocks){
+			foreach( TetroBlock tb in tblocks ) {
 				tb.SetSize(BlockSize);
 			}
 

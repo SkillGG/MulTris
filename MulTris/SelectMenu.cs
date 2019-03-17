@@ -48,23 +48,8 @@ namespace MulTris {
 
 		private Texture2D texture;
 
-		/// <summary>
-		/// <para>This Rectangle Array contains source placements of given elements from MainMenu/mainMenu texture.</para>
-		/// <para>0 - Pointer</para>
-		/// </summary>
-		private Rectangle[] sprites = new Rectangle[1] {
-			new Rectangle(0, 0, 60, 90)		// Pointer
-		};
-
-		private bool changeBTNPos = false;
-		private bool changeBTNSprite = false;
-
-		/// <summary>
-		/// <para>This Rectangle Array contains all placements of buttons on-screen. Where they are drawn</para>
-		/// <para>0 - Pointer</para>
-		/// </summary>
-		private Rectangle[] positions = new Rectangle[1] {
-			new Rectangle(0, 0, 0, 0)		// Pointer
+		private Sprite[] sprites = new Sprite[1] {
+			new Sprite()		// Pointer
 		};
 
 		/// <summary>
@@ -92,65 +77,64 @@ namespace MulTris {
 				ChangeColorFor(b, c);
 		}
 
-		public void SetSpritePosFor(uint b, Nullable<Rectangle> r) {
-			changeBTNSprite = true;
+		public void SetSpritePosFor(uint b, Rectangle? r) {
 			if( b > sprites.Length - 1 )
 				return;
-			Rectangle sr = r ?? sprites[b];
+			Rectangle sr = r ?? sprites[b].Source;
 			switch( b ) {
 				case 0:
-					Pointer = new Rectangle[2] { sr, sr };
+					Pointer.AllowCP(true);
+					Pointer.Change(sr);
+					Pointer.DisAllow( );
 					break;
 			}
-			changeBTNSprite = false;
 		}
 
 		public void SetSpritePosFor(uint b, Point? p) {
-			changeBTNSprite = true;
-			if( b > positions.Length - 1 )
+			if( b > sprites.Length - 1 )
 				return;
-			Point sp = p ?? positions[b].Location;
+			Point sp = p ?? sprites[b].Position.Location;
 			switch( b ) {
 				case 0:
-					Pointer = new Rectangle[2] { new Rectangle(sp, Pointer[0].Size), new Rectangle(sp, Pointer[0].Size) };
+					Pointer.AllowCP(true);
+					Pointer.Change(sp);
+					Pointer.DisAllow( );
 					break;
 			}
-			changeBTNSprite = false;
 		}
 
-		public void SetPositionFor(uint b, Nullable<Rectangle> r) {
+		public void SetPositionFor(uint b, Rectangle? r) {
 			new Debug("SelectMenu#SetPositionFor", "Trying to set " + b + "'s position to " + r + ".");
-			changeBTNPos = true;
-			if( b > positions.Length - 1 )
+			if( b > sprites.Length - 1 )
 				return;
-			Rectangle sr = r ?? positions[b];
+			Rectangle sp = r ?? sprites[b].Position;
 			switch( b ) {
 				case 0:
-					Pointer = new Rectangle[2] { sr, sr };
+					Pointer.AllowCP(false);
+					Pointer.Change(sp);
+					Pointer.DisAllow( );
 					break;
 			}
-			changeBTNPos = false;
 			new Debug("SelectMenu#SetPositionFor", "Successfully changed " + b + "'s position!");
 		}
 
 		public void DefaultPointerPositionSpriteSize() {
-			changeBTNPos = true;
-			Pointer = new Rectangle[2] { new Rectangle(Pointer[0].Location, Pointer[1].Size), new Rectangle( ) };
-			changeBTNPos = false;
+			Pointer.AllowCP(false);
+			Pointer.Change(new Rectangle(Pointer.Position.Location, Pointer.Source.Size));
+			Pointer.DisAllow( );
 		}
 
 		public void SetPositionFor(uint b, Point? p) {
-			new Debug("SelectMenu#SetPositionFor", "Trying to set " + b + "'s position to " + p + ".");
-			changeBTNPos = true;
-			if( b > positions.Length - 1 )
+			if( b > sprites.Length - 1 )
 				return;
-			Point sp = p ?? positions[b].Location;
+			Point sp = p ?? sprites[b].Position.Location;
 			switch( b ) {
 				case 0:
-					Pointer = new Rectangle[2] { new Rectangle(sp, Pointer[0].Size), new Rectangle(sp, Pointer[0].Size) };
+					Pointer.AllowCP(false);
+					Pointer.Change(sp);
+					Pointer.DisAllow( );
 					break;
 			}
-			changeBTNPos = false;
 			new Debug("SelectMenu#SetPositionFor", "Successfully changed " + b + "'s position!");
 		}
 
@@ -161,20 +145,9 @@ namespace MulTris {
 		/// <para>1 - position on sprite</para>
 		/// To change it's position or sprite you have to use <see cref="Menu.SetSpritePosFor(int,Rectangle)"/>/<see cref="Menu.SetPositionFor(int,Rectangle)"/> with 0 as first parameter.
 		/// </summary>
-		public Rectangle[] Pointer {
+		public Sprite Pointer {
 			get {
-				return new Rectangle[2] { positions[0], sprites[0] };
-			}
-			set {
-				if( changeBTNPos && changeBTNSprite ) {
-					changeBTNPos = false;
-					changeBTNSprite = false;
-					throw new InvalidOperationException("You should not be able to do that operation!");
-				}
-				if( changeBTNPos )
-					positions[0] = value[0];
-				if( changeBTNSprite )
-					sprites[0] = value[0];
+				return sprites[0];
 			}
 		}
 
@@ -261,9 +234,8 @@ namespace MulTris {
 				}
 			);
 
-
+			sprites[0] = new Sprite( );
 			this.MovePointerTo(0);
-			DefaultPointerPositionSpriteSize( );
 
 			new Debug(pl, "Initializing GameOptions.");
 			// Option init
@@ -281,15 +253,17 @@ namespace MulTris {
 			string pl = "SelectMenu#Load";
 			try {
 				new Debug(pl, "Loading SelectMenu");
-				texture = cm.Load<Texture2D>("MainMenu/selectMenu");
+				sprites[0].Load(cm.Load<Texture2D>("MainMenu/selectMenu"), null);
 
+				new Debug(pl, "Loaded Sprite: " + Pointer.ToString());
+				DefaultPointerPositionSpriteSize( );
 				new Debug(pl, "Calculating texture-based sizes and positions.");
 
-				this.OfflineLabel = new Rectangle(PointerTypeLocations[0].X, PointerTypeLocations[0].Y, Pointer[1].Width + ( (int) this.game.FiraLight20.MeasureString("Offline").X ) + 50, Pointer[1].Height);
+				this.OfflineLabel = new Rectangle(PointerTypeLocations[0].X, PointerTypeLocations[0].Y, Pointer.Source.Width + ( (int) this.game.FiraLight20.MeasureString("Offline").X ) + 50, Pointer.Source.Height);
 
 				// Change Play location
 				this.PointerOptionLocations[(int) OPTPLValues.Play] = new Point((int) ( ( this.game.WIDTH / 2 ) - ( this.game.FiraLight20.MeasureString("Play").X * 4 ) ), this.game.HEIGHT - 100);
-				this.PlayLabel = new Rectangle(PointerOptionLocations[(int) OPTPLValues.Play].X, PointerOptionLocations[(int) OPTPLValues.Play].Y, Pointer[1].Width + 50 + ( (int) this.game.FiraLight20.MeasureString("Play").X ), Pointer[1].Height);
+				this.PlayLabel = new Rectangle(PointerOptionLocations[(int) OPTPLValues.Play].X, PointerOptionLocations[(int) OPTPLValues.Play].Y, Pointer.Source.Width + 50 + ( (int) this.game.FiraLight20.MeasureString("Play").X ), Pointer.Source.Height);
 
 				new Debug(pl, "Loading complete!");
 
@@ -302,10 +276,10 @@ namespace MulTris {
 
 		public void Draw(SpriteBatch sb) {
 			if( loaded ) {
-
+				new Debug("SelectMenu#Draw", $"Pointer Sprite: {Pointer}");
 				if( this.State == SelectState.TYPE ) {
 
-					sb.Draw(this.texture, Pointer[0], Pointer[1], colors[0]);
+					sb.Draw(Pointer.Texture, Pointer.Position, Pointer.Source, colors[0]);
 
 					switch( this.PointerLocation ) {
 						case 0:
@@ -314,8 +288,8 @@ namespace MulTris {
 								this.game.FiraLight20,
 								"Offline",
 								new Vector2(
-									PointerTypeLocations[0].X + Pointer[1].Width + 50,
-									PointerTypeLocations[0].Y + ( Pointer[1].Height / 2 - this.game.FiraLight20.MeasureString("Offline").Y / 2 )
+									PointerTypeLocations[0].X + Pointer.Source.Width + 50,
+									PointerTypeLocations[0].Y + ( Pointer.Source.Height / 2 - this.game.FiraLight20.MeasureString("Offline").Y / 2 )
 								),
 								Color.White
 							);
@@ -325,14 +299,14 @@ namespace MulTris {
 
 				} else if( this.State == SelectState.OPTIONS ) {
 					// Draw options
-					sb.Draw(this.texture, Pointer[0], Pointer[1], colors[0]);
+					sb.Draw(Pointer.Texture, Pointer.Position, Pointer.Source, colors[0]);
 
 					sb.DrawString(
 						this.game.FiraLight20,
 						"Play",
 						new Vector2(
-							PointerOptionLocations[(int) OPTPLValues.Play].X + Pointer[0].Width + 50,
-							PointerOptionLocations[(int) OPTPLValues.Play].Y + ( Pointer[0].Height / 2 - this.game.FiraLight20.MeasureString("Play").Y / 2 )
+							PointerOptionLocations[(int) OPTPLValues.Play].X + Pointer.Position.Width + 50,
+							PointerOptionLocations[(int) OPTPLValues.Play].Y + ( Pointer.Position.Height / 2 - this.game.FiraLight20.MeasureString("Play").Y / 2 )
 						),
 						Color.White
 					);

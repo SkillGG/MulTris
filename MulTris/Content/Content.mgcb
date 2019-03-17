@@ -34,7 +34,7 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Fira24.spritefont
 
-#begin Game/blockZ.png
+#begin Game/blocks.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -44,7 +44,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Game/blockZ.png
+/build:Game/blocks.png
 
 #begin Game/Board.png
 /importer:TextureImporter
