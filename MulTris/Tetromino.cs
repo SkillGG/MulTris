@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace MulTris {
 	public enum TetroType {
@@ -14,6 +15,9 @@ namespace MulTris {
 	}
 
 	public class Tetromino {
+
+		private Multris Game { get; set; }
+		public Board Board { get; private set; }
 
 		private bool falling;
 		private uint toGround = 10;
@@ -241,10 +245,10 @@ namespace MulTris {
 			}
 		}
 
-		public void Draw(SpriteBatch sb, Multris m) {
+		public void Draw(SpriteBatch sb) {
 
 			foreach( TetroBlock t in tblocks ) {
-				t.Draw(sb, this.rotateState, m);
+				t.Draw(sb, this.rotateState, Game);
 			}
 
 		}
@@ -263,12 +267,14 @@ namespace MulTris {
 
 		private int BlockSize;
 
-		public Tetromino(TetroType t, Board board) {
+		public Tetromino(TetroType t, Multris m, Board board) {
 			new Debug("Tetromino#()", "Tetromino(" + t + ") Initialization");
 			this.falling = true;
 			this.type = t;
-
+			this.Game = m;
 			Point[] rBl = GetRotationOffsetsFor(t, rotateState);
+
+			this.Board = board;
 
 			new Debug("Tetromino#()", "Setting proper offsets for given TetroType(" + t + ").");
 
@@ -283,6 +289,22 @@ namespace MulTris {
 				tb.SetSize(BlockSize);
 			}
 
+		}
+
+		public TetroBorder GetBorder() {
+			return new TetroBorder(new Rectangle(tblocks[0].Position, tblocks[0].Size),
+			new Rectangle(tblocks[1].Position, tblocks[1].Size),
+			new Rectangle(tblocks[2].Position, tblocks[2].Size),
+			new Rectangle(tblocks[3].Position, tblocks[3].Size));
+		}
+
+		public bool Collide(Tetromino t) {
+			if( !t.Equals(this) ) {
+				if( GetBorder( ).Intersects(t.GetBorder( )) )
+					return true;
+				return false;
+			}
+			return true;
 		}
 
 		public void RotateLeft() {
@@ -314,14 +336,28 @@ namespace MulTris {
 		}
 
 		public void Gravity() {
-			if( toGround == 0 )
-				falling = false;
+			string pl = "Tetromino#Gravity";
+			new Debug(pl, $"Gravity check!");
 			if( falling ) {
+				new Debug(pl, $"Is falling!");
+				if( toGround == 0 ) {
+					new Debug(pl, $"Grounding!");
+					falling = false;
+					return;
+				}
+				new Debug(pl, $"Falling. {toGround} to ground!");
 				toGround--;
+				new Debug(pl, $"Before any move: {tblocks[0].Position}");
 				tblocks[0].MoveBy(0, 1);
-				//RotateRight( );
-			} else
-				new Debug("Tetromino#Gravity", "Tetromino's already on ground!");
+				new Debug(pl, $"After first move: {tblocks[0].Position}");
+				foreach( Tetromino t in Board ) {
+					new Debug(pl, $"Checking for: {this.Collide(t)}");
+					if( this.Collide(t) ) {
+						tblocks[0].MoveBy(0, -1);
+						falling = false;
+					}
+				}
+			}
 		}
 
 	}

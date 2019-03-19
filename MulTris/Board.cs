@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace MulTris {
 	public class Board {
@@ -31,7 +32,29 @@ namespace MulTris {
 		// PR
 		private Rectangle[] positions = new Rectangle[0];
 
+		public TetroBlock this[ushort x, ushort y]{
+			get{
+				return null;
+			}
+		}
+
+		public Tetromino this[ushort i] {
+			get {
+				return tetrominoes[i];
+			}
+		}
+
+		public IEnumerator<Tetromino> GetEnumerator() {
+			return tetrominoes.GetEnumerator( );
+		}
+
+		public ushort Length() {
+			return (ushort) tetrominoes.Count;
+		}
+
 		private List<Tetromino> tetrominoes;
+		public List<Tetromino> Tetrominoes { get => tetrominoes; }
+
 
 		// Size
 		private Point size;
@@ -85,7 +108,7 @@ namespace MulTris {
 			if( init && load ) {
 				// Draw
 				foreach( Tetromino t in tetrominoes ) {
-					t.Draw(sb, this.Game);
+					t.Draw(sb);
 				}
 			}
 		}
@@ -115,15 +138,15 @@ namespace MulTris {
 
 			new Debug("Board#AddTetromino", "Adding new Tetromino!");
 
-			var nt = new Tetromino(t, this) {
+			var nt = new Tetromino(t, this.Game, this) {
 				Fall = true
 			};
 
 			nt.MoveTo((int) ( this.Size.X / 2 ));
 
 			new Debug("Board#AddTetromino", "Centering new Tetromino.");
-			
-			
+
+
 			Tetromino lt = null;
 			if( tetrominoes.Count != 0 )
 				lt = tetrominoes[tetrominoes.Count - 1];

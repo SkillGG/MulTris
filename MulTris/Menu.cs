@@ -17,7 +17,7 @@ namespace MulTris {
 
 		public MenuState State { set; get; } = MenuState.NORMAL;
 
-		private void ExitConfirm() { new Debug("Menu#ExitConfirm", "State of menu changed to EXIT. (Showing exit confiramtion window)"); this.State = MenuState.EXIT; }
+		private void ExitConfirm() { new Debug("Menu#ExitConfirm", "State of menu changed to EXIT. (Showing exit confiramtion window)", Debug.Importance.NOTIFICATION); this.State = MenuState.EXIT; }
 
 		private Sprite[] sprites = new Sprite[7] {
 			new Sprite(),
@@ -110,7 +110,7 @@ namespace MulTris {
 		}
 
 		public void SetPositionFor(uint b, Rectangle? r) {
-			new Debug("Menu#SetPositionFor", "Trying to set " + b + "'s position to " + r + ".");
+			new Debug("Menu#SetPositionFor", "Trying to set " + b + "'s position to " + r + ".", Debug.Importance.NOTIFICATION);
 			bool sp = false;
 			if( b > sprites.Length - 1 )
 				return;
@@ -152,7 +152,7 @@ namespace MulTris {
 					ConfirmCloseButton.DisAllow( );
 					break;
 			}
-			new Debug("Menu#SetPositionFor", "Successfully changed " + b + "'s position!");
+			new Debug("Menu#SetPositionFor", "Successfully changed " + b + "'s position!", Debug.Importance.NOTIFICATION);
 		}
 
 		/// <summary>
@@ -229,7 +229,7 @@ namespace MulTris {
 
 			string pl = "Menu#()";
 
-			new Debug(pl, "Menu Initialization");
+			new Debug(pl, "Menu Initialization", Debug.Importance.INIT_INFO);
 
 			this.game = g;
 
@@ -239,7 +239,7 @@ namespace MulTris {
 		public void Load(ContentManager cm) {
 			try {
 				string pl = "Menu#Load";
-				new Debug(pl, "Loading 'MainMenu/mainMenu' texture");
+				new Debug(pl, "Loading 'MainMenu/mainMenu' texture", Debug.Importance.INIT_INFO);
 				Texture2D tx = cm.Load<Texture2D>("MainMenu/mainMenu");
 				sprites[0].Load(tx, new Rectangle(0, 100, 900, 180));   // Game Logo
 				sprites[1].Load(tx, new Rectangle(0, 0, 240, 100));     // Play Button
@@ -251,7 +251,7 @@ namespace MulTris {
 
 				// Compute sprite scales for lower resolutions!
 				// Compute CloseWindow for lower resolutions
-				new Debug(pl, "Doing graphics calculations");
+				new Debug(pl, "Doing graphics calculations", Debug.Importance.NOTIFICATION);
 				int marginCW = 50;
 				int widthCW = QuickOperations._IRB(false, CloseWindow.Source.Width, 0, game.WIDTH - ( 2 * marginCW ));
 				int heightCW = widthCW * CloseWindow.Source.Height / CloseWindow.Source.Width;
@@ -271,7 +271,7 @@ namespace MulTris {
 				int logo_bottom = 50 + heightL;
 
 
-				new Debug(pl, "Changing positions of menu elements.");
+				new Debug(pl, "Changing positions of menu elements.", Debug.Importance.INIT_INFO);
 				this.SetPositionFor(0, new Rectangle(xL, 50, widthL, heightL));                 // Set position for LOGO
 				this.SetPositionFor(1, new Rectangle(                                           // Set position for PlayButton
 					( game.WIDTH - PlayButton.Source.Width ) / 2,                               // Middle of Window
@@ -296,11 +296,11 @@ namespace MulTris {
 																						// Set position for ConfirmCloseWindow
 				this.SetPositionFor(6, new Rectangle(xcCW, ycCW, ConfirmCloseButton.Source.Width, ConfirmCloseButton.Source.Height));
 
-				new Debug("Menu#Load", "Loaded successfully");
+				new Debug("Menu#Load", "Loaded successfully", Debug.Importance.NOTIFICATION);
 				this.loaded = true;
 			} catch( Exception e ) {
 				loaded = false;
-				new Debug("Menu#Load", "ERR: " + e);
+				new Debug("Menu#Load", "ERR: " + e, Debug.Importance.ERROR);
 			}
 		}
 

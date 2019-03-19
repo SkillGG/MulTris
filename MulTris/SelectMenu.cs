@@ -276,7 +276,6 @@ namespace MulTris {
 
 		public void Draw(SpriteBatch sb) {
 			if( loaded ) {
-				new Debug("SelectMenu#Draw", $"Pointer Sprite: {Pointer}");
 				if( this.State == SelectState.TYPE ) {
 
 					sb.Draw(Pointer.Texture, Pointer.Position, Pointer.Source, colors[0]);

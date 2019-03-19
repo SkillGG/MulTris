@@ -7,11 +7,33 @@ using System.Threading;
 namespace MulTris {
 
 	public class Debug {
-		public Debug(string invoker, object msg) {
-			//Console.WriteLine("( " + invoker + " ) " + msg.ToString( ));
+
+		private Debug() { }
+
+		public enum Importance {
+			INIT_INFO = 0,
+			DRAW_INFO = 1,
+			VALUE_INFO = 4,
+			NOTIFICATION = 3,
+			IMPORTANT_INFO = 4,
+			WARN = 5,
+			hid = 6,
+			ERROR = 7
 		}
-		public Debug(string invoker, string msg) {
-			Console.WriteLine("( " + invoker + " ) " + msg);
+
+		private static Importance Minimp = Importance.INIT_INFO;
+		public static Importance MinImp { get => Minimp; set => Minimp = value; }
+
+		public Debug(string invoker, object msg, Importance importance = (Importance) 0) {
+			uint imp = (uint) importance;
+			if( imp >= (uint) MinImp )
+				Console.WriteLine($"[{importance.ToString()}]( " + invoker + " ) " + msg.ToString( ));
+		}
+		
+		public Debug(string invoker, string msg, Importance importance = (Importance) 0) {
+			uint imp = (uint) importance;
+			if( imp >= (uint) MinImp )
+				Console.WriteLine($"[{importance.ToString()}]( " + invoker + " ) " + msg);
 		}
 	}
 
@@ -91,11 +113,11 @@ namespace MulTris {
 		*/
 
 		public Multris() {
-
+			Debug.MinImp = Debug.Importance.IMPORTANT_INFO;
 			graphics = new GraphicsDeviceManager(this);
 			Content.RootDirectory = "Content";
 
-			new Debug("Multris#()", "App Initialization.");
+			new Debug("Multris#()", "App Initialization.", Debug.Importance.INIT_INFO);
 
 			// Show the mouse
 			this.IsMouseVisible = true;
@@ -107,14 +129,14 @@ namespace MulTris {
 			Window.IsBorderless = BORDERLESS;
 			Window.Position = new Point(ScreenCentre(WIDTH, 0).X, 0);
 
-			new Debug("Multris#()", "Correctly setted up default screen parameters.");
+			new Debug("Multris#()", "Correctly setted up default screen parameters.", Debug.Importance.NOTIFICATION);
 
 			// Setting default FPS settings
 			this.IsFixedTimeStep = true;
 			this.graphics.SynchronizeWithVerticalRetrace = true;
-			this.TargetElapsedTime = new System.TimeSpan(0, 0, 0, 0, 33); // Play at ~30.3FPS
+			this.TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 33); // Play at ~30.3FPS
 
-			new Debug("Multris#()", "Setted up framerate.");
+			new Debug("Multris#()", "Setted up framerate.", Debug.Importance.NOTIFICATION);
 
 		}
 
@@ -129,25 +151,25 @@ namespace MulTris {
 
 			string pl = "Multris#Initialize";
 
-			new Debug(pl, "Initializing variables");
+			new Debug(pl, "Initializing variables", Debug.Importance.INIT_INFO);
 
 			this.inputs = new InputState( );
 			this.menu = new Menu(this);
 			this.selectmenu = new SelectMenu(this);
 			this.tetris = new Tetris(this);
 
-			new Debug(pl, "DONE: inputs, menu, selectmenu, tetris");
+			new Debug(pl, "DONE: inputs, menu, selectmenu, tetris", Debug.Importance.NOTIFICATION);
 
-			new Debug(pl, "Initializing second(timer-handling) thread!");
+			new Debug(pl, "Initializing second(timer-handling) thread!", Debug.Importance.INIT_INFO);
 
 			try {
 				this.thread = new Thread(new ThreadStart(STF));
 				thread.Start( );
 			} catch( Exception e ) {
-				new Debug(pl, " ERR: " + e);
+				new Debug(pl, " ERR: " + e, Debug.Importance.ERROR);
 			}
 
-			new Debug(pl, "DONE: thread (" + thread.ManagedThreadId + ")");
+			new Debug(pl, "DONE: thread (" + thread.ManagedThreadId + ")", Debug.Importance.NOTIFICATION);
 
 			base.Initialize( );
 		}
@@ -163,26 +185,26 @@ namespace MulTris {
 			// Create a new SpriteBatch, which can be used to draw textures.
 			this.spriteBatch = new SpriteBatch(GraphicsDevice);
 
-			new Debug(pl, "Loading Content!");
+			new Debug(pl, "Loading Content!", Debug.Importance.INIT_INFO);
 
 			// TODO: use this.Content to load your game content here
 
-			new Debug(pl, "Fonts:");
+			new Debug(pl, "Fonts:", Debug.Importance.INIT_INFO);
 
-			new Debug(pl, "FiraLight");
+			new Debug(pl, "FiraLight", Debug.Importance.INIT_INFO);
 			this.FiraLight24 = this.Content.Load<SpriteFont>("Fonts/Fira24");
 			this.FiraLight20 = this.Content.Load<SpriteFont>("Fonts/Fira20");
 			this.FiraLight10 = this.Content.Load<SpriteFont>("Fonts/Fira10");
-			new Debug(pl, "DONE: FiraLight24, FiraLight20, FiraLight10");
+			new Debug(pl, "DONE: FiraLight24, FiraLight20, FiraLight10", Debug.Importance.NOTIFICATION);
 
 
-			new Debug(pl, "Loading sub-classes");
+			new Debug(pl, "Loading sub-classes", Debug.Importance.INIT_INFO);
 			tetris.Load(Content);
-			new Debug(pl, "DONE: tetris");
+			new Debug(pl, "DONE: tetris", Debug.Importance.NOTIFICATION);
 			menu.Load(this.Content);
-			new Debug(pl, "DONE: menu");
+			new Debug(pl, "DONE: menu", Debug.Importance.NOTIFICATION);
 			selectmenu.Load(Content);
-			new Debug(pl, "DONE: selectmenu");
+			new Debug(pl, "DONE: selectmenu", Debug.Importance.NOTIFICATION);
 
 		}
 
@@ -268,10 +290,10 @@ namespace MulTris {
 
 		public void InitializeGame(GameOption<Point> size, GameOption<bool>[] bck) {
 			// INITIALIZE GAME WITH GIVEN OPTIONS
-			new Debug("Multris#InitializeGame", "Initializing new Tetris game with: " + size + ", [" + string.Join(", ", (object[]) bck) + "]");
+			new Debug("Multris#InitializeGame", "Initializing new Tetris game with: " + size + ", [" + string.Join(", ", (object[]) bck) + "]", Debug.Importance.INIT_INFO);
 			this.tetris.Initialize(size, bck);
 			this.State = GameState.GAME;
-			new Debug("Multris#InitializeGame", "New Tetris Game has been initialized with: " + size + ", [" + string.Join(", ", (object[]) bck) + "]");
+			new Debug("Multris#InitializeGame", "New Tetris Game has been initialized with: " + size + ", [" + string.Join(", ", (object[]) bck) + "]", Debug.Importance.NOTIFICATION);
 		}
 
 		public void Terminate() {
@@ -295,23 +317,23 @@ namespace MulTris {
 
 		public void ChangeGameResolution(int? w, int? h, bool? FS, bool? BL) {
 			string pl = "Multris#ChangeGameResolution";
-			new Debug(pl, "Changing Resolution with: {w:" + w + ",h:" + h + ",FS:" + FS + ",BL:" + BL + "}");
+			new Debug(pl, "Changing Resolution with: {w:" + w + ",h:" + h + ",FS:" + FS + ",BL:" + BL + "}", Debug.Importance.IMPORTANT_INFO);
 			this.changeRes = true;
 			this.WIDTH = w ?? this.WIDTH;
 			this.HEIGHT = h ?? this.HEIGHT;
 			this.FULLSCREEN = FS ?? this.FULLSCREEN;
 			this.BORDERLESS = BL ?? this.BORDERLESS;
 			this.changeRes = false;
-			new Debug("Multris#ChangeGameResolution", "Successfully changed resolution");
+			new Debug("Multris#ChangeGameResolution", "Successfully changed resolution", Debug.Importance.NOTIFICATION);
 
-			new Debug(pl, "Saving changes");
+			new Debug(pl, "Saving changes", Debug.Importance.INIT_INFO);
 			// Save game res
 			this.graphics.PreferredBackBufferHeight = HEIGHT;
 			this.graphics.PreferredBackBufferWidth = WIDTH;
 			this.graphics.IsFullScreen = FULLSCREEN;
 			Window.IsBorderless = BORDERLESS;
 			this.graphics.ApplyChanges( );
-			new Debug(pl, "Successfully saved new resolution");
+			new Debug(pl, "Successfully saved new resolution", Debug.Importance.NOTIFICATION);
 		}
 
 		/* SCREEN FUNCTIONS */
@@ -328,7 +350,7 @@ namespace MulTris {
 			}
 		}
 
-		public void ChangeFixedRate(UInt32 nfr) {
+		public void ChangeFixedRate(uint nfr) {
 			this.FixedRate = nfr;
 			futim.Change(0, this.FixedRate);
 		}

@@ -88,6 +88,7 @@
     <Compile Include="Sprite.cs" />
     <Compile Include="Tetris.cs" />
     <Compile Include="TetroBlock.cs" />
+    <Compile Include="TetroBorder.cs" />
     <Compile Include="Tetromino.cs" />
   </ItemGroup>
   <ItemGroup>
