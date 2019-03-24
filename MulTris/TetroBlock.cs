@@ -21,11 +21,27 @@ namespace MulTris {
 		private Point offset;
 		public Point Offset { get => offset; }
 
+		public Point ScreenPosition { 
+			get => {
+					if(!this.CenterPiece){
+						return new Point(Position.X * Side, Position.Y * Side);
+					}
+					else{
+						return new Point(
+							CenterPiece.Position.X * CenterPiece.Side + Offset.X * Side,
+							CenterPiece.Position.Y * CenterPiece.Side + Offset.Y * Side
+						);
+					}
+			}
+		}
+		
 		private Sprite sprite;
 
 		private int x, y;
 		public Point Position { get => new Point(x, y); }
 
+		
+		
 		private int square;
 		public int Side { get => square; }
 		public Point Size { get => new Point(square); }
@@ -33,7 +49,7 @@ namespace MulTris {
 		public void SetSize(int side) {
 			square = side;
 		}
-
+		
 		private TBT type;
 		public TBT Type { get => type; }
 
@@ -107,19 +123,13 @@ namespace MulTris {
 			if( load && init ) {
 				if( centerPiece != null ) {
 					// OFFSET PIECE
-					Rectangle pos =
-					new Rectangle(
-						new Point(
-							CenterPiece.Position.X * CenterPiece.Side + Offset.X * Side,
-							CenterPiece.Position.Y * CenterPiece.Side + Offset.Y * Side
-						),
-					Size);
+					Rectangle pos = new Rectangle(this.ScreenPosition, Size);
 					sb.Draw(sprite.Texture, pos, sprite.Source, Color.White);
 					if( centerPiece.DebugInfo )
 						sb.DrawString(m.FiraLight10, "O" + Offset.X + ":" + Offset.Y, new Vector2(pos.X + 5, pos.Y + 5), Color.White);
 				} else {
 					//CENTER PIECE
-					Rectangle pos = new Rectangle(new Point(Position.X * square, Position.Y * square), Size);
+					Rectangle pos = new Rectangle(this.ScreenPosition, Size);
 					sb.Draw(sprite.Texture, pos, sprite.Source, new Color(255, 255, 255) * 0.5f);
 					if( this.DebugInfo )
 						sb.DrawString(m.FiraLight10, "R" + Rotate.ToString( ), new Vector2(pos.X + 5, pos.Y + 5), Color.Red);

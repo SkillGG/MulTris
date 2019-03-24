@@ -293,9 +293,9 @@ namespace MulTris {
 
 		public TetroBorder GetBorder() {
 			return new TetroBorder(new Rectangle(tblocks[0].Position, tblocks[0].Size),
-			new Rectangle(tblocks[1].Position, tblocks[1].Size),
-			new Rectangle(tblocks[2].Position, tblocks[2].Size),
-			new Rectangle(tblocks[3].Position, tblocks[3].Size));
+			new Rectangle(tblocks[1].ScreenPosition, tblocks[1].Size),
+			new Rectangle(tblocks[2].ScreenPosition, tblocks[2].Size),
+			new Rectangle(tblocks[3].ScreenPosition, tblocks[3].Size));
 		}
 
 		public bool Collide(Tetromino t) {
