@@ -22,8 +22,8 @@ namespace MulTris {
 		public Point Offset { get => offset; }
 
 		public Point ScreenPosition { 
-			get => {
-					if(!this.CenterPiece){
+			get {
+					if(this.CenterPiece == null){
 						return new Point(Position.X * Side, Position.Y * Side);
 					}
 					else{

@@ -36,7 +36,8 @@ namespace MulTris {
 		public byte Rotation { get => rotateState; }
 		public Point[] GetRotationOffsetsFor(TetroType t, byte rotS) {
 
-			Point[] ret = new Point[3];
+			Point[] ret = new Point[4];
+			ret[4] = new Point(0);
 
 			switch( t ) {
 				// TODO: Rotations
@@ -72,25 +73,25 @@ namespace MulTris {
 				case TetroType.S:
 					switch( rotS ) {
 						case 1:
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
+							ret[0] = new Point(1, 0);
+							ret[1] = new Point(0, 1);
+							ret[2] = new Point(1, 1);
 							break;
 						case 2:
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
+							ret[0] = new Point(1, 0);
+							ret[1] = new Point(0, 1);
+							ret[2] = new Point(0, -1);
 							break;
 						case 3:
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
+							ret[0] = new Point(1, 0);
+							ret[1] = new Point(0, 1);
+							ret[2] = new Point(0, -1);
 							break;
 						default:
 							// 0 or 3+
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
+							ret[0] = new Point(1, 0);
+							ret[1] = new Point(0, 1);
+							ret[2] = new Point(0, -1);
 							break;
 					}
 					break;
@@ -259,6 +260,14 @@ namespace MulTris {
 
 		public void MoveBy(int x) {
 			this.tblocks[0].MoveBy(x, 0);
+			foreach( Tetromino t in Board ) {
+				if( this.Fall && !t.Fall ) {
+					if( this.Collide(t) ) {
+						this.tblocks[0].MoveBy(-x, 0);
+						SaveRotate( );
+					}
+				}
+			}
 		}
 
 		private byte rotateState = 0;
@@ -284,6 +293,9 @@ namespace MulTris {
 			tblocks[1].Init(tblocks[0], rBl[0].X, rBl[0].Y);
 			tblocks[2].Init(tblocks[0], rBl[1].X, rBl[1].Y);
 			tblocks[3].Init(tblocks[0], rBl[2].X, rBl[2].Y);
+			if(rBl[3].X == 1){
+				this.MoveBy(rBl[3].Y);
+			}
 
 			foreach( TetroBlock tb in tblocks ) {
 				tb.SetSize(BlockSize);
@@ -292,7 +304,8 @@ namespace MulTris {
 		}
 
 		public TetroBorder GetBorder() {
-			return new TetroBorder(new Rectangle(tblocks[0].Position, tblocks[0].Size),
+			return new TetroBorder(
+			new Rectangle(tblocks[0].ScreenPosition, tblocks[0].Size),
 			new Rectangle(tblocks[1].ScreenPosition, tblocks[1].Size),
 			new Rectangle(tblocks[2].ScreenPosition, tblocks[2].Size),
 			new Rectangle(tblocks[3].ScreenPosition, tblocks[3].Size));
@@ -309,12 +322,21 @@ namespace MulTris {
 
 		public void RotateLeft() {
 			new Debug("Tetromino#RotateLeft", "Rotating Left");
-			rotateState = QuickOperations._IRB(true, rotateState, minRot, maxRot);
-			if( rotateState != 0 )
-				rotateState--;
+			byte nrs = QuickOperations._IRB(true, rotateState, minRot, maxRot);
+			byte ors = QuickOperations._IRB(true, rotateState, minRot, maxRot);
+			if( nrs != 0 )
+				nrs--;
 			else
-				rotateState = 3;
+				nrs = 3;
+			rotateState = nrs;
 			SaveRotate( );
+			foreach( Tetromino t in Board ) {
+				if( this.Collide(t) ) {
+					rotateState = ors;
+					SaveRotate( );
+				}
+			}
+
 		}
 
 		public void SaveRotate() {
@@ -323,16 +345,29 @@ namespace MulTris {
 			tblocks[1].ResetOffset(rbl[0].X, rbl[0].Y);
 			tblocks[2].ResetOffset(rbl[1].X, rbl[1].Y);
 			tblocks[3].ResetOffset(rbl[2].X, rbl[2].Y);
+			if( rbl[3].X == 1 ) {
+				this.MoveBy(rbl[3].Y);
+			}
 		}
 
 		public void RotateRight() {
-			new Debug("Tetromino#RotateLeft", "Rotating Right");
-			rotateState = QuickOperations._IRB(true, rotateState, minRot, maxRot);
-			if( rotateState < 3 )
-				rotateState++;
+			new Debug("Tetromino#RotateRight", "Rotating Right");
+			byte nrs = QuickOperations._IRB(true, rotateState, minRot, maxRot);
+			byte ors = QuickOperations._IRB(true, rotateState, minRot, maxRot);
+			if( nrs < 3 )
+				nrs++;
 			else
-				rotateState = 0;
+				nrs = 0;
+			rotateState = nrs;
 			SaveRotate( );
+			foreach( Tetromino t in Board ) {
+				if( this.Fall && !t.Fall ) {
+					if( this.Collide(t) ) {
+						rotateState = ors;
+						SaveRotate( );
+					}
+				}
+			}
 		}
 
 		public void Gravity() {
@@ -351,10 +386,11 @@ namespace MulTris {
 				tblocks[0].MoveBy(0, 1);
 				new Debug(pl, $"After first move: {tblocks[0].Position}");
 				foreach( Tetromino t in Board ) {
-					new Debug(pl, $"Checking for: {this.Collide(t)}");
-					if( this.Collide(t) ) {
-						tblocks[0].MoveBy(0, -1);
-						falling = false;
+					if( !t.Fall && this.Fall ) {
+						if( this.Collide(t) ) {
+							tblocks[0].MoveBy(0, -1);
+							falling = false;
+						}
 					}
 				}
 			}

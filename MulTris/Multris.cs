@@ -13,7 +13,7 @@ namespace MulTris {
 		public enum Importance {
 			INIT_INFO = 0,
 			DRAW_INFO = 1,
-			VALUE_INFO = 4,
+			VALUE_INFO = 2,
 			NOTIFICATION = 3,
 			IMPORTANT_INFO = 4,
 			WARN = 5,

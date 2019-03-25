@@ -3,6 +3,14 @@
 namespace MulTris {
 	public class TetroBorder {
 
+		public override string ToString() {
+			string rss = "";
+			foreach(Rectangle r in Rectangles){
+				rss += r.ToString( ) + ", ";
+			}
+			return "[TetroBorder] Contains:[" +rss + "]";
+		}
+
 		public Rectangle[] Rectangles { get => rs; }
 		private readonly Rectangle[] rs = new Rectangle[4];
 
@@ -26,6 +34,7 @@ namespace MulTris {
 		public bool Intersects(TetroBorder tb) {
 			if( tb == null )
 				return false;
+			new Debug("TetroBorder#Interects", "Checking if " + this.ToString( ) + " intersects with: " + tb.ToString( ), Debug.Importance.VALUE_INFO);
 			foreach( Rectangle r in Rectangles ) {
 				foreach( Rectangle pr in tb.Rectangles ) {
 					if( pr.Intersects(r) ) {
