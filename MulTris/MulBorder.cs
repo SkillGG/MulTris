@@ -1,26 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 
 namespace MulTris {
-	public class TetroBorder {
+
+	public class MulBorder {
 
 		public override string ToString() {
-			string rss = "";
-			foreach(Rectangle r in Rectangles){
-				rss += r.ToString( ) + ", ";
-			}
-			return "[TetroBorder] Contains:[" +rss + "]";
+			return $"[TetroBorder] Contains:[{string.Join(", ", rs)}]";
 		}
 
-		public Rectangle[] Rectangles { get => rs; }
-		private readonly Rectangle[] rs = new Rectangle[4];
-
-		public TetroBorder(Rectangle? r1, Rectangle? r2, Rectangle? r3, Rectangle? r4) {
-			rs = new Rectangle[4] {
-				r1 ?? new Rectangle(0,0,50,50),
-				r2 ?? new Rectangle(50,0,50,50),
-				r3 ?? new Rectangle(100,0,50,50),
-				r4 ?? new Rectangle(150,0,50,50)
-			};
+		public MulBorder(List<Rectangle> l) {
+			this.Rectangles = l;
 		}
 
 		public bool Intersects(Rectangle pr) {
@@ -31,7 +21,7 @@ namespace MulTris {
 			return false;
 		}
 
-		public bool Intersects(TetroBorder tb) {
+		public bool Intersects(MulBorder tb) {
 			if( tb == null )
 				return false;
 			new Debug("TetroBorder#Interects", "Checking if " + this.ToString( ) + " intersects with: " + tb.ToString( ), Debug.Importance.VALUE_INFO);
@@ -44,6 +34,9 @@ namespace MulTris {
 			}
 			return false;
 		}
+
+		protected List<Rectangle> rs;
+		public List<Rectangle> Rectangles { get => rs; private set => rs = value; }
 
 	}
 }

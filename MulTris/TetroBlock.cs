@@ -21,27 +21,26 @@ namespace MulTris {
 		private Point offset;
 		public Point Offset { get => offset; }
 
-		public Point ScreenPosition { 
+		public Point ScreenPosition {
 			get {
-					if(this.CenterPiece == null){
-						return new Point(Position.X * Side, Position.Y * Side);
-					}
-					else{
-						return new Point(
-							CenterPiece.Position.X * CenterPiece.Side + Offset.X * Side,
-							CenterPiece.Position.Y * CenterPiece.Side + Offset.Y * Side
-						);
-					}
+				if( this.CenterPiece == null ) {
+					return new Point(Position.X * Side, Position.Y * Side);
+				} else {
+					return new Point(
+						CenterPiece.Position.X * CenterPiece.Side + Offset.X * Side,
+						CenterPiece.Position.Y * CenterPiece.Side + Offset.Y * Side
+					);
+				}
 			}
 		}
-		
+
 		private Sprite sprite;
 
 		private int x, y;
 		public Point Position { get => new Point(x, y); }
+		public Point GridPosition { get => new Point(( ScreenPosition.X / Side ) + 1, ( ScreenPosition.Y / Side ) + 1); }
 
-		
-		
+
 		private int square;
 		public int Side { get => square; }
 		public Point Size { get => new Point(square); }
@@ -49,14 +48,17 @@ namespace MulTris {
 		public void SetSize(int side) {
 			square = side;
 		}
-		
+
 		private TBT type;
 		public TBT Type { get => type; }
 
-		public TetroBlock(TBT tp, int size) {
+		private string SPS_DEBUG = "";
+
+		public TetroBlock(TBT tp, int size, string pos) {
 			new Debug("TetroBlock#()", "TetroBlock Initialization");
 			this.type = tp;
 			this.square = size;
+			this.SPS_DEBUG = pos ?? "0";
 		}
 
 		public void Load(ContentManager cm, TetroType TetraLetter) {
@@ -72,10 +74,17 @@ namespace MulTris {
 
 		}
 
+		private bool dst = false;
+		public bool Destroyed { get => dst; private set => dst = value; }
+
+		public void Destroy() {
+			Destroyed = true;
+		}
+
 		public void Load(Texture2D s, TetroType TetraLetter) {
 			try {
 				new Debug("TetroBlock#Load", "Loading TetroBlock sprite with Texture2D.");
-				this.sprite = new Sprite(s, new Rectangle(new Point(0, 50 * (int) TetraLetter), new Point(50, 50)));
+				this.sprite = new Sprite(s, new Rectangle(new Point(50 * (int) TetraLetter, 0), new Point(50, 50)));
 				this.load = true;
 			} catch( Exception e ) {
 				this.load = false;
@@ -120,19 +129,20 @@ namespace MulTris {
 
 		public void Draw(SpriteBatch sb, byte Rotate, Multris m) {
 
-			if( load && init ) {
+			if( load && init && !Destroyed ) {
 				if( centerPiece != null ) {
 					// OFFSET PIECE
 					Rectangle pos = new Rectangle(this.ScreenPosition, Size);
 					sb.Draw(sprite.Texture, pos, sprite.Source, Color.White);
 					if( centerPiece.DebugInfo )
 						sb.DrawString(m.FiraLight10, "O" + Offset.X + ":" + Offset.Y, new Vector2(pos.X + 5, pos.Y + 5), Color.White);
+					sb.DrawString(m.FiraLight10, SPS_DEBUG, new Vector2(pos.X + 5, pos.Y + 5), Color.White);
 				} else {
 					//CENTER PIECE
 					Rectangle pos = new Rectangle(this.ScreenPosition, Size);
 					sb.Draw(sprite.Texture, pos, sprite.Source, new Color(255, 255, 255) * 0.5f);
-					if( this.DebugInfo )
-						sb.DrawString(m.FiraLight10, "R" + Rotate.ToString( ), new Vector2(pos.X + 5, pos.Y + 5), Color.Red);
+					//if( this.DebugInfo )
+					sb.DrawString(m.FiraLight10, "R" + Rotate.ToString( ), new Vector2(pos.X + 5, pos.Y + 5), Color.Red);
 				}
 			}
 

@@ -20,14 +20,13 @@ namespace MulTris {
 		public Board Board { get; private set; }
 
 		private bool falling;
-		private uint toGround = 10;
 		private TetroType type;
 
 		private TetroBlock[] tblocks = new TetroBlock[4]{
-			new TetroBlock(TBT.Center, 50),
-			new TetroBlock(TBT.Side, 50),
-			new TetroBlock(TBT.Side, 50),
-			new TetroBlock(TBT.Side, 50)
+			new TetroBlock(TBT.Center, 50, null),
+			new TetroBlock(TBT.Side, 50, "1"),
+			new TetroBlock(TBT.Side, 50, "2"),
+			new TetroBlock(TBT.Side, 50, "3")
 		};
 
 		public TetroType Type { get => type; }
@@ -37,7 +36,7 @@ namespace MulTris {
 		public Point[] GetRotationOffsetsFor(TetroType t, byte rotS) {
 
 			Point[] ret = new Point[4];
-			ret[4] = new Point(0);
+			ret[3] = new Point(0);
 
 			switch( t ) {
 				// TODO: Rotations
@@ -60,6 +59,7 @@ namespace MulTris {
 							ret[0] = new Point(0, 1);
 							ret[1] = new Point(1, 0);
 							ret[2] = new Point(1, -1);
+							ret[3] = new Point(0, -1);
 							break;
 						default:
 							// 0 or 3+
@@ -73,25 +73,26 @@ namespace MulTris {
 				case TetroType.S:
 					switch( rotS ) {
 						case 1:
-							ret[0] = new Point(1, 0);
-							ret[1] = new Point(0, 1);
+							ret[0] = new Point(0, -1);
+							ret[1] = new Point(1, 0);
 							ret[2] = new Point(1, 1);
 							break;
 						case 2:
-							ret[0] = new Point(1, 0);
-							ret[1] = new Point(0, 1);
-							ret[2] = new Point(0, -1);
+							ret[0] = new Point(1, -1);
+							ret[1] = new Point(0, -1);
+							ret[2] = new Point(-1, 0);
+							ret[3] = new Point(0, 1);
 							break;
 						case 3:
-							ret[0] = new Point(1, 0);
-							ret[1] = new Point(0, 1);
-							ret[2] = new Point(0, -1);
+							ret[0] = new Point(-1, -1);
+							ret[1] = new Point(-1, 0);
+							ret[2] = new Point(0, 1);
 							break;
 						default:
 							// 0 or 3+
 							ret[0] = new Point(1, 0);
 							ret[1] = new Point(0, 1);
-							ret[2] = new Point(0, -1);
+							ret[2] = new Point(-1, 1);
 							break;
 					}
 					break;
@@ -210,9 +211,7 @@ namespace MulTris {
 		}
 
 		public void Update(InputState bef) {
-
 			InputState inputs = new InputState( );
-
 			if( inputs.KeyUp(bef, Keys.Up) ) {
 				RotateRight( );
 			}
@@ -222,10 +221,10 @@ namespace MulTris {
 			if( inputs.KeyUp(bef, Keys.Left) ) {
 				MoveBy(-1);
 			}
-			if( inputs.KeyUp(bef, Keys.Down) ) {
-				Gravity( );
+			if( inputs.KeyUp(bef, Keys.D) ) {
+				if( !tblocks[0].Destroyed )
+					Destroy(0);
 			}
-
 		}
 
 		public void ToggleDebug() {
@@ -247,24 +246,56 @@ namespace MulTris {
 		}
 
 		public void Draw(SpriteBatch sb) {
-
 			foreach( TetroBlock t in tblocks ) {
 				t.Draw(sb, this.rotateState, Game);
 			}
+		}
 
+		public void OneUp() {
+			this.tblocks[0].MoveBy(0, -1);
 		}
 
 		public void MoveTo(int x) {
 			this.tblocks[0].MoveTo(x, tblocks[0].Position.Y);
 		}
 
-		public void MoveBy(int x) {
+		private void MoveBy(int x, int y) {
 			this.tblocks[0].MoveBy(x, 0);
-			foreach( Tetromino t in Board ) {
-				if( this.Fall && !t.Fall ) {
-					if( this.Collide(t) ) {
-						this.tblocks[0].MoveBy(-x, 0);
-						SaveRotate( );
+			if( Board.Length( ) > 0 ) {
+				foreach( Tetromino t in Board ) {
+					if( t != this ) {
+						if( !t.Fall ) {
+							if( AllCollides(t) ) {
+								tblocks[0].MoveBy(-x, -y);
+							}
+						}
+					} else {
+						if( AllCollides(null) ) {
+							tblocks[0].MoveBy(-x, -y);
+						}
+					}
+
+				}
+			}
+		}
+
+		public void MoveBy(int x) {
+			if( Fall ) {
+				this.tblocks[0].MoveBy(x, 0);
+				if( Board.Length( ) > 0 ) {
+					foreach( Tetromino t in Board ) {
+						if( t != this ) {
+							if( !t.Fall ) {
+								if( AllCollides(t) ) {
+									tblocks[0].MoveBy(-x, 0);
+								}
+							}
+						} else {
+							if( AllCollides(null) ) {
+								tblocks[0].MoveBy(-x, 0);
+
+							}
+						}
 					}
 				}
 			}
@@ -285,7 +316,7 @@ namespace MulTris {
 
 			this.Board = board;
 
-			new Debug("Tetromino#()", "Setting proper offsets for given TetroType(" + t + ").");
+			new Debug("Tetromino#()", $"Setting proper offsets for given TetroType( { t } ) : ${ string.Join(",", rBl) }.");
 
 			this.BlockSize = board.GridSize;
 
@@ -293,22 +324,31 @@ namespace MulTris {
 			tblocks[1].Init(tblocks[0], rBl[0].X, rBl[0].Y);
 			tblocks[2].Init(tblocks[0], rBl[1].X, rBl[1].Y);
 			tblocks[3].Init(tblocks[0], rBl[2].X, rBl[2].Y);
-			if(rBl[3].X == 1){
-				this.MoveBy(rBl[3].Y);
-			}
+			this.MoveBy(rBl[3].X, rBl[3].Y);
 
 			foreach( TetroBlock tb in tblocks ) {
 				tb.SetSize(BlockSize);
 			}
-
 		}
 
-		public TetroBorder GetBorder() {
-			return new TetroBorder(
-			new Rectangle(tblocks[0].ScreenPosition, tblocks[0].Size),
-			new Rectangle(tblocks[1].ScreenPosition, tblocks[1].Size),
-			new Rectangle(tblocks[2].ScreenPosition, tblocks[2].Size),
-			new Rectangle(tblocks[3].ScreenPosition, tblocks[3].Size));
+		public MulBorder GetBorder() {
+			List<Rectangle> lor = new List<Rectangle>( );
+			foreach( TetroBlock t in tblocks ) {
+				if( !t.Destroyed ) {
+					lor.Add(new Rectangle(t.ScreenPosition, t.Size));
+				}
+			}
+			return new MulBorder(lor);
+		}
+
+		public bool AllCollides(Tetromino t) {
+			if( CollideWithGround( ) || CollideWithWall( ) )
+				return true;
+			if( t != null ) {
+				if( Collide(t) )
+					return true;
+			}
+			return false;
 		}
 
 		public bool Collide(Tetromino t) {
@@ -317,23 +357,53 @@ namespace MulTris {
 					return true;
 				return false;
 			}
-			return true;
+			return false;
+		}
+
+		public bool CollideWithGround() {
+			if( GetBorder( ).Intersects(new Rectangle(0, this.BlockSize * Board.Size.Y, Game.WIDTH, Game.HEIGHT)) ) {
+				return true;
+			}
+			return false;
+		}
+
+		public bool CollideWithWall() {
+			if( GetBorder( ).Intersects(new Rectangle(Board.LeftWall.X - 100, 0, 99, Game.HEIGHT)) ) { // Left wall
+				return true;
+			}
+			if( GetBorder( ).Intersects(new Rectangle(Board.RightWall.X, 0, 10, Game.HEIGHT)) ) {  // Right wall
+				return true;
+			}
+			return false;
 		}
 
 		public void RotateLeft() {
-			new Debug("Tetromino#RotateLeft", "Rotating Left");
-			byte nrs = QuickOperations._IRB(true, rotateState, minRot, maxRot);
-			byte ors = QuickOperations._IRB(true, rotateState, minRot, maxRot);
-			if( nrs != 0 )
-				nrs--;
-			else
-				nrs = 3;
-			rotateState = nrs;
-			SaveRotate( );
-			foreach( Tetromino t in Board ) {
-				if( this.Collide(t) ) {
-					rotateState = ors;
-					SaveRotate( );
+			if( Fall ) {
+				new Debug("Tetromino#RotateLeft", "Rotating Left");
+				byte nrs = QuickOperations._IRB(true, rotateState, minRot, maxRot);
+				byte ors = QuickOperations._IRB(true, rotateState, minRot, maxRot);
+				if( nrs != 0 )
+					nrs--;
+				else
+					nrs = 3;
+				rotateState = nrs;
+				SaveRotate( );
+				if( Board.Length( ) > 0 ) {
+					foreach( Tetromino t in Board ) {
+						if( t != this ) {
+							if( !t.Fall ) {
+								if( AllCollides(t) ) {
+									rotateState = ors;
+									SaveRotate( );
+								}
+							}
+						} else {
+							if( AllCollides(null) ) {
+								rotateState = ors;
+								SaveRotate( );
+							}
+						}
+					}
 				}
 			}
 
@@ -345,29 +415,58 @@ namespace MulTris {
 			tblocks[1].ResetOffset(rbl[0].X, rbl[0].Y);
 			tblocks[2].ResetOffset(rbl[1].X, rbl[1].Y);
 			tblocks[3].ResetOffset(rbl[2].X, rbl[2].Y);
-			if( rbl[3].X == 1 ) {
-				this.MoveBy(rbl[3].Y);
-			}
 		}
 
 		public void RotateRight() {
-			new Debug("Tetromino#RotateRight", "Rotating Right");
-			byte nrs = QuickOperations._IRB(true, rotateState, minRot, maxRot);
-			byte ors = QuickOperations._IRB(true, rotateState, minRot, maxRot);
-			if( nrs < 3 )
-				nrs++;
-			else
-				nrs = 0;
-			rotateState = nrs;
-			SaveRotate( );
-			foreach( Tetromino t in Board ) {
-				if( this.Fall && !t.Fall ) {
-					if( this.Collide(t) ) {
-						rotateState = ors;
-						SaveRotate( );
+			if( Fall ) {
+				new Debug("Tetromino#RotateRight", "Rotating Right");
+				byte nrs = QuickOperations._IRB(true, rotateState, minRot, maxRot);
+				byte ors = QuickOperations._IRB(true, rotateState, minRot, maxRot);
+				if( nrs < 3 )
+					nrs++;
+				else
+					nrs = 0;
+				rotateState = nrs;
+				SaveRotate( );
+				if( Board.Length( ) > 0 ) {
+					foreach( Tetromino t in Board ) {
+						if( t != this ) {
+							if( !t.Fall ) {
+								if( AllCollides(t) ) {
+									rotateState = ors;
+									SaveRotate( );
+								}
+							}
+						} else {
+							if( AllCollides(null) ) {
+								rotateState = ors;
+								SaveRotate( );
+							}
+						}
 					}
 				}
 			}
+		}
+
+		public bool IsOnLine(int y) {
+			foreach( TetroBlock t in tblocks ) {
+				if( t.GridPosition.Y == y )
+					return true;
+			}
+			return false;
+		}
+
+		public List<TetroBlock> OnLine(int y) {
+			List<TetroBlock> ol = new List<TetroBlock>( );
+			foreach( TetroBlock t in tblocks ) {
+				if( t.GridPosition.Y == y )
+					ol.Add(t);
+			}
+			return ol;
+		}
+
+		public void Destroy(int i) {
+			tblocks[QuickOperations.InRangeBoundInclusive(i, 0, tblocks.Length - 1)].Destroy( );
 		}
 
 		public void Gravity() {
@@ -375,26 +474,43 @@ namespace MulTris {
 			new Debug(pl, $"Gravity check!");
 			if( falling ) {
 				new Debug(pl, $"Is falling!");
-				if( toGround == 0 ) {
-					new Debug(pl, $"Grounding!");
-					falling = false;
-					return;
-				}
-				new Debug(pl, $"Falling. {toGround} to ground!");
-				toGround--;
 				new Debug(pl, $"Before any move: {tblocks[0].Position}");
 				tblocks[0].MoveBy(0, 1);
 				new Debug(pl, $"After first move: {tblocks[0].Position}");
-				foreach( Tetromino t in Board ) {
-					if( !t.Fall && this.Fall ) {
-						if( this.Collide(t) ) {
-							tblocks[0].MoveBy(0, -1);
-							falling = false;
+
+				/**
+				 Collision checking
+				 */
+				if( this.CollideWithGround( ) ) {
+					if( this.Fall ) {
+						tblocks[0].MoveBy(0, -1);
+						falling = false;
+					}
+				} else {
+					if( Board.Length( ) > 0 ) {
+						foreach( Tetromino t in Board ) {
+							if( t != this ) {
+								if( !t.Fall && this.Fall ) {
+									if( AllCollides(t) ) {
+										tblocks[0].MoveBy(0, -1);
+										falling = false;
+									}
+								}
+							} else {
+								if( Fall ) {
+									if( AllCollides(null) ) {
+										tblocks[0].MoveBy(0, -1);
+										falling = false;
+									}
+								}
+							}
 						}
 					}
 				}
+				/**
+				 End of Collision Checking 
+				 */
 			}
 		}
-
 	}
 }

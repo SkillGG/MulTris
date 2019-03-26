@@ -270,7 +270,7 @@ namespace MulTris {
 				// DRAW OPTIONS
 			}
 			if( this.State == GameState.GAME ) {
-				this.spriteBatch.DrawString(FiraLight10, ( "M: " + this.State + " S: " ), new Vector2(0, 0), Color.Yellow);
+				this.spriteBatch.DrawString(FiraLight10, ( $"M: {this.State} S: {tetris.board.Size.X}/{tetris.board.Size.Y}"), new Vector2(0, 0), Color.Yellow);
 				// DRAW GAME
 				this.tetris.Draw(this.spriteBatch);
 			}
@@ -345,6 +345,7 @@ namespace MulTris {
 				new Debug("Multris#STF:2", "Initializing timers.");
 				futim = new Timer(FixedUpdate, null, 0, (int) Rate);
 				sectim = new Timer(FixedUpdateS, null, 0, 1000);
+				tetris.secondInit( );
 			} catch( Exception ) {
 				// log errors
 			}

@@ -32,8 +32,8 @@ namespace MulTris {
 		// PR
 		private Rectangle[] positions = new Rectangle[0];
 
-		public TetroBlock this[ushort x, ushort y]{
-			get{
+		public TetroBlock this[ushort x, ushort y] {
+			get {
 				return null;
 			}
 		}
@@ -54,11 +54,28 @@ namespace MulTris {
 
 		private List<Tetromino> tetrominoes;
 		public List<Tetromino> Tetrominoes { get => tetrominoes; }
+		public Tetromino LastTetro { get => tetrominoes.Last( ); }
 
 
 		// Size
 		private Point size;
+		/// <summary>
+		/// Size of the board in blocks
+		/// </summary>
 		public Point Size { get => size; }
+
+		/// <summary>
+		/// Width of playable area in pixels
+		/// </summary>
+		public int Width { get => GridSize * ( Size.X + 1 ); }
+		/// <summary>
+		/// Position of left-top corner of left wall of the board
+		/// </summary>
+		public Point LeftWall { get => new Point(Game.WIDTH / 2 - Width / 2, 0); }
+		/// <summary>
+		/// Position of left-top corner of right wall of the board
+		/// </summary>
+		public Point RightWall { get => new Point(Game.WIDTH / 2 + Width / 2, 0); }
 
 		// Grid
 		private bool grid = true;
@@ -66,6 +83,9 @@ namespace MulTris {
 		public void ShowGrid() { grid = true; }
 		public void HideGrid() { grid = false; }
 
+		/// <summary>
+		/// Size of one block
+		/// </summary>
 		public int GridSize {
 			get {
 				int ret = QuickOperations.InRangeBoundInclusive(Game.HEIGHT / size.Y, 0, 50);
@@ -80,16 +100,31 @@ namespace MulTris {
 		}
 
 		public void Init(Point bs) {
-			new Debug("Board#Init", "Initialization with GameOptions");
+			new Debug("Board#Init", $"Initialization with GameOptions: BS:{bs}");
 			try {
-				this.size = bs;
+				this.size = new Point(bs.X, bs.Y);
 				this.tetrominoes = new List<Tetromino>( );
-				AddTetromino(TetroType.Z);
+				AddTetromino(TetroType.S);
 				this.init = true;
 			} catch( System.Exception e ) {
 				this.init = false;
 				new Debug("Board#Init", "ERR: " + e);
 			}
+		}
+
+		public bool CheckIfFullLine(int y) {
+			int onthisline = 0;
+			foreach( Tetromino t in tetrominoes ) {
+				if( !t.Fall )
+				// TODO: Debug this errro
+					onthisline += t.OnLine(y).Count;
+			}
+			//new Debug("", $"On line {y} found {onthisline} blocks!", Debug.Importance.IMPORTANT_INFO);
+			if( onthisline >= Size.X ) {
+				new Debug("","");
+				return true;
+			}
+			return false;
 		}
 
 		public void Load(ContentManager cm) {
@@ -110,39 +145,55 @@ namespace MulTris {
 				foreach( Tetromino t in tetrominoes ) {
 					t.Draw(sb);
 				}
+				sb.Draw(this.boardTXT, new Rectangle(LeftWall.X - 4, 0, Width + 1, Game.HEIGHT + 10), new Rectangle(0, 5, 50, 45), Color.White);
 			}
+		}
+
+		public void DestroyLine(int y) {
+			List<TetroBlock> toDest = new List<TetroBlock>( );
+			List<Tetromino> overOrOn = new List<Tetromino>( );
+			foreach( Tetromino t in tetrominoes ) {
+				for( int i = y - 1; i > 0; i-- )
+					if( t.IsOnLine(i) )
+						if( !overOrOn.Contains(t) )
+							overOrOn.Add(t);
+				t.OnLine(y).ForEach((z) => { if( !toDest.Contains(z) ) toDest.Add(z); });
+			}
+			toDest.ForEach((x) => x.Destroy( ));
+			overOrOn.ForEach((x) => x.CenterBlock.MoveBy(0, 1));
 		}
 
 		public void Update(InputState bef) {
 			if( init ) {
 				Tetromino lastTetro = tetrominoes.Last( );
-
 				InputState inputs = new InputState( );
-
 				if( inputs.KeyUp(bef, Keys.F3) ) {
 					foreach( Tetromino t in tetrominoes ) {
 						t.ToggleDebug( );
 					}
 				}
-
-				if( !lastTetro.Fall ) {
-					AddTetromino(TetroType.Z);
-					return;
-				} else {
-					lastTetro.Update(bef);
+				for( int i = Size.Y; i > 0; i-- ) {
+					if( CheckIfFullLine(i) ) {
+						DestroyLine(i);
+						break;
+					}
 				}
+				lastTetro.Update(bef);
 			}
 		}
 
+		private readonly List<TetroType> UsedTT = new List<TetroType> { TetroType.Z, TetroType.S };
+
 		public void AddTetromino(TetroType t) {
 
-			new Debug("Board#AddTetromino", "Adding new Tetromino!");
+			new Debug("Board#AddTetromino", $"Adding new Tetromino {t.ToString( )}!", Debug.Importance.IMPORTANT_INFO);
 
 			var nt = new Tetromino(t, this.Game, this) {
 				Fall = true
 			};
 
-			nt.MoveTo((int) ( this.Size.X / 2 ));
+			nt.MoveTo((int) ( this.Size.X / 2 + this.LeftWall.X / GridSize ));
+			nt.OneUp( );
 
 			new Debug("Board#AddTetromino", "Centering new Tetromino.");
 
@@ -154,7 +205,10 @@ namespace MulTris {
 
 			switch( t ) {
 				case TetroType.Z:
-					nt.Load(blockTXT);
+					nt.Load(blockTXT, new Rectangle(0, 0, 50, 50));
+					break;
+				case TetroType.S:
+					nt.Load(blockTXT, new Rectangle(50, 0, 50, 50));
 					break;
 				default:
 					nt.Load(this.Game.Content);
@@ -169,20 +223,38 @@ namespace MulTris {
 			new Debug("Board#AddTetromino", "Added new Tetromino #" + tetrominoes.Count);
 		}
 
-		public void FixedUpdateS() {
+		public TetroType RandomTT(List<TetroType> l) {
+			int rn = new Random(DateTime.Now.Millisecond).Next(0, l.Count * 10);
+			new Debug("Board#RandomTT", $"CAP: 0 - {l.Count * 10 - 1}. #: {rn}.", Debug.Importance.IMPORTANT_INFO);
+			return l[(int) ( rn / 10 )];
+		}
+
+		private bool sped = false;
+
+		public void FallUpdate() {
 			if( init && load ) {
+				if( !sped ) {
+					if( tetrominoes.Count > 5 ) {
+						new Debug("FU", "Speed up!", Debug.Importance.IMPORTANT_INFO);
+						this.Game.tetris.SpeedUp(4);
+						sped = true;
+					}
+				}
 				// Every second
-				new Debug("Board#FixedUpdateS", $"1s passed!");
+				new Debug("Board#FixedUpdateS", $"Fall should occur!");
 				Tetromino lastTetro = tetrominoes.Last( );
 
 				if( !lastTetro.Fall ) {
-					AddTetromino(TetroType.Z);
+					AddTetromino(RandomTT(UsedTT));
 					return;
 				} else {
 					lastTetro.Gravity( );
 				}
-
 			}
+		}
+
+		public void FixedUpdateS() {
+
 		}
 
 	}
