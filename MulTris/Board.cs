@@ -114,14 +114,16 @@ namespace MulTris {
 
 		public bool CheckIfFullLine(int y) {
 			int onthisline = 0;
-			foreach( Tetromino t in tetrominoes ) {
+			for( int i = 0; i < tetrominoes.Count - 1; i++ ) {
+				Tetromino t = tetrominoes[i];
 				if( !t.Fall )
-				// TODO: Debug this errro
 					onthisline += t.OnLine(y).Count;
 			}
-			//new Debug("", $"On line {y} found {onthisline} blocks!", Debug.Importance.IMPORTANT_INFO);
+			/*
+			if( onthisline != 0 )
+				new Debug("", $"On line {y} found {onthisline} blocks!", Debug.Importance.IMPORTANT_INFO);
+			*/
 			if( onthisline >= Size.X ) {
-				new Debug("","");
 				return true;
 			}
 			return false;
@@ -145,22 +147,22 @@ namespace MulTris {
 				foreach( Tetromino t in tetrominoes ) {
 					t.Draw(sb);
 				}
-				sb.Draw(this.boardTXT, new Rectangle(LeftWall.X - 4, 0, Width + 1, Game.HEIGHT + 10), new Rectangle(0, 5, 50, 45), Color.White);
+				//sb.Draw(this.boardTXT, new Rectangle(LeftWall.X - 4, 0, Width + 1, Game.HEIGHT + 10), new Rectangle(0, 5, 50, 45), Color.White);
 			}
 		}
 
 		public void DestroyLine(int y) {
-			List<TetroBlock> toDest = new List<TetroBlock>( );
-			List<Tetromino> overOrOn = new List<Tetromino>( );
 			foreach( Tetromino t in tetrominoes ) {
-				for( int i = y - 1; i > 0; i-- )
-					if( t.IsOnLine(i) )
-						if( !overOrOn.Contains(t) )
-							overOrOn.Add(t);
-				t.OnLine(y).ForEach((z) => { if( !toDest.Contains(z) ) toDest.Add(z); });
+				if( !t.Fall ) {
+					if( t.IsOnLine(y) ) {
+						t.OnLine(y).ForEach((x) => x.Destroy( ));
+						t.DropBlocksOver(y);
+					}
+					else{
+						t.DropIfNotUnder(y);
+					}
+				}
 			}
-			toDest.ForEach((x) => x.Destroy( ));
-			overOrOn.ForEach((x) => x.CenterBlock.MoveBy(0, 1));
 		}
 
 		public void Update(InputState bef) {
@@ -170,12 +172,6 @@ namespace MulTris {
 				if( inputs.KeyUp(bef, Keys.F3) ) {
 					foreach( Tetromino t in tetrominoes ) {
 						t.ToggleDebug( );
-					}
-				}
-				for( int i = Size.Y; i > 0; i-- ) {
-					if( CheckIfFullLine(i) ) {
-						DestroyLine(i);
-						break;
 					}
 				}
 				lastTetro.Update(bef);
@@ -223,13 +219,42 @@ namespace MulTris {
 			new Debug("Board#AddTetromino", "Added new Tetromino #" + tetrominoes.Count);
 		}
 
+		private int rngid = 0;
+		private List<TetroType> GMN = new List<TetroType> {
+			TetroType.S,
+			TetroType.Z,
+			TetroType.Z,
+			TetroType.Z,
+			TetroType.Z,
+			TetroType.S,
+			TetroType.S,
+			TetroType.S,
+			TetroType.Z,
+			TetroType.I
+		};
+
 		public TetroType RandomTT(List<TetroType> l) {
-			int rn = new Random(DateTime.Now.Millisecond).Next(0, l.Count * 10);
-			new Debug("Board#RandomTT", $"CAP: 0 - {l.Count * 10 - 1}. #: {rn}.", Debug.Importance.IMPORTANT_INFO);
-			return l[(int) ( rn / 10 )];
+			/*
+				int rn = new Random(DateTime.Now.Millisecond).Next(0, l.Count * 10);
+				new Debug("Board#RandomTT", $"CAP: 0 - {l.Count * 10 - 1}. #: {rn}.", Debug.Importance.IMPORTANT_INFO);
+				return l[(int) ( rn / 10 )];
+			*/
+			rngid++;
+			var r = GMN[rngid];
+			if( r == TetroType.I ) {
+				rngid = 0;
+				r = TetroType.S;
+			}
+			return r;
 		}
 
 		private bool sped = false;
+
+		public void ShowAllTBData(){
+			foreach(Tetromino t in this){
+				t.ShowTBData( );
+			}
+		}
 
 		public void FallUpdate() {
 			if( init && load ) {
@@ -243,7 +268,17 @@ namespace MulTris {
 				// Every second
 				new Debug("Board#FixedUpdateS", $"Fall should occur!");
 				Tetromino lastTetro = tetrominoes.Last( );
-
+				bool ds = false;
+				for( int i = Size.Y; i > 0; i-- ) {
+					if( CheckIfFullLine(i) ) {
+						new Debug("", $"Line {i} is full. Destroying!", Debug.Importance.IMPORTANT_INFO);
+						DestroyLine(i);
+						ds = true;
+					}
+				}
+				if( ds ) {
+					ShowAllTBData( );
+				}
 				if( !lastTetro.Fall ) {
 					AddTetromino(RandomTT(UsedTT));
 					return;

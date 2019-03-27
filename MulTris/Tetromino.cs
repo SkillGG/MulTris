@@ -23,11 +23,16 @@ namespace MulTris {
 		private TetroType type;
 
 		private TetroBlock[] tblocks = new TetroBlock[4]{
-			new TetroBlock(TBT.Center, 50, null),
-			new TetroBlock(TBT.Side, 50, "1"),
-			new TetroBlock(TBT.Side, 50, "2"),
-			new TetroBlock(TBT.Side, 50, "3")
+			new TetroBlock(TBT.Center, 50, null, 0),
+			new TetroBlock(TBT.Side, 50, "1", 1),
+			new TetroBlock(TBT.Side, 50, "2", 2),
+			new TetroBlock(TBT.Side, 50, "3", 3)
 		};
+
+		public void ShowTBData(){
+			foreach( TetroBlock t in tblocks )
+				t.ShowData( );
+		}
 
 		public TetroType Type { get => type; }
 		public bool Fall { get => falling; set => falling = value; }
@@ -255,6 +260,10 @@ namespace MulTris {
 			this.tblocks[0].MoveBy(0, -1);
 		}
 
+		private void MoveTo(int x, int y) {
+			this.tblocks[0].MoveTo(x, y);
+		}
+
 		public void MoveTo(int x) {
 			this.tblocks[0].MoveTo(x, tblocks[0].Position.Y);
 		}
@@ -317,17 +326,19 @@ namespace MulTris {
 			this.Board = board;
 
 			new Debug("Tetromino#()", $"Setting proper offsets for given TetroType( { t } ) : ${ string.Join(",", rBl) }.");
-
+			 
 			this.BlockSize = board.GridSize;
 
 			tblocks[0].Init(null, 0, 0);
 			tblocks[1].Init(tblocks[0], rBl[0].X, rBl[0].Y);
 			tblocks[2].Init(tblocks[0], rBl[1].X, rBl[1].Y);
 			tblocks[3].Init(tblocks[0], rBl[2].X, rBl[2].Y);
-			this.MoveBy(rBl[3].X, rBl[3].Y);
-
+			this.MoveTo(rBl[3].X, rBl[3].Y);
+			int tbid = Board.Length( ) * 4;
 			foreach( TetroBlock tb in tblocks ) {
+				tb.SetId(tbid);
 				tb.SetSize(BlockSize);
+				tbid++;
 			}
 		}
 
@@ -368,10 +379,10 @@ namespace MulTris {
 		}
 
 		public bool CollideWithWall() {
-			if( GetBorder( ).Intersects(new Rectangle(Board.LeftWall.X - 100, 0, 99, Game.HEIGHT)) ) { // Left wall
+			if( GetBorder( ).Intersects(new Rectangle(Board.LeftWall.X - 100, -100, 99, Game.HEIGHT + 100)) ) { // Left wall
 				return true;
 			}
-			if( GetBorder( ).Intersects(new Rectangle(Board.RightWall.X, 0, 10, Game.HEIGHT)) ) {  // Right wall
+			if( GetBorder( ).Intersects(new Rectangle(Board.RightWall.X, -100, 10, Game.HEIGHT + 100)) ) {  // Right wall
 				return true;
 			}
 			return false;
@@ -450,16 +461,36 @@ namespace MulTris {
 
 		public bool IsOnLine(int y) {
 			foreach( TetroBlock t in tblocks ) {
-				if( t.GridPosition.Y == y )
+				if( t.GridPosition.Y == y && !t.Destroyed )
 					return true;
 			}
 			return false;
 		}
 
+		public void DropIfNotUnder(int y){
+			TetroBlock lowest = tblocks[0];
+			foreach(TetroBlock t in tblocks){
+				if(t.GridPosition.Y > lowest.GridPosition.Y){
+					lowest = t;
+				}
+			}
+			if(lowest.GridPosition.Y < y){
+				CenterBlock.MoveBy(0, 1);
+			}
+		}
+
+		public void DropBlocksOver(int y) {
+			foreach( TetroBlock t in tblocks ) {
+				if( t.GridPosition.Y <= y && !t.Destroyed ) {
+					t.DDDown( );
+				}
+			}
+		}
+
 		public List<TetroBlock> OnLine(int y) {
 			List<TetroBlock> ol = new List<TetroBlock>( );
 			foreach( TetroBlock t in tblocks ) {
-				if( t.GridPosition.Y == y )
+				if( t.GridPosition.Y == y && !t.Destroyed )
 					ol.Add(t);
 			}
 			return ol;

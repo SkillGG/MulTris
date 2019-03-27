@@ -15,6 +15,10 @@ namespace MulTris {
 		private bool load = false;
 		private bool init = false;
 
+		public void ShowData() {
+			new Debug($"TetroBlock({Tetrid})", $"D:{Destroyed}, pY:{Position.Y}, ddY:{DropDownOffset.Y}, oY:{Offset.Y}, gpY:{GridPosition.Y}", Debug.Importance.IMPORTANT_INFO);
+		}
+
 		private TetroBlock centerPiece;
 		public TetroBlock CenterPiece { get => centerPiece; }
 
@@ -24,17 +28,30 @@ namespace MulTris {
 		public Point ScreenPosition {
 			get {
 				if( this.CenterPiece == null ) {
-					return new Point(Position.X * Side, Position.Y * Side);
+					return new Point(Side * ( Position.X + DropDownOffset.X ), Side * ( Position.Y + DropDownOffset.Y ));
 				} else {
 					return new Point(
-						CenterPiece.Position.X * CenterPiece.Side + Offset.X * Side,
-						CenterPiece.Position.Y * CenterPiece.Side + Offset.Y * Side
+						Side * ( centerPiece.Position.X + Offset.X + DropDownOffset.X ),
+						Side * ( centerPiece.Position.Y + Offset.Y + DropDownOffset.Y )
 					);
 				}
 			}
 		}
 
 		private Sprite sprite;
+
+		private int Tetrid;
+
+		public void SetId(int id) {
+			Tetrid = id;
+		}
+
+		private Point DropDownOffset = new Point(0);
+
+		public void DDDown() {
+			new Debug($"TetroBlock({Tetrid}, {Destroyed})", $"Droping down. {DropDownOffset.Y} => {DropDownOffset.Y + 1}", Debug.Importance.IMPORTANT_INFO);
+			DropDownOffset = new Point(0, DropDownOffset.Y + 1);
+		}
 
 		private int x, y;
 		public Point Position { get => new Point(x, y); }
@@ -54,8 +71,9 @@ namespace MulTris {
 
 		private string SPS_DEBUG = "";
 
-		public TetroBlock(TBT tp, int size, string pos) {
-			new Debug("TetroBlock#()", "TetroBlock Initialization");
+		public TetroBlock(TBT tp, int size, string pos, int id) {
+			this.Tetrid = id;
+			new Debug($"TetroBlock#({Tetrid})", "TetroBlock Initialization");
 			this.type = tp;
 			this.square = size;
 			this.SPS_DEBUG = pos ?? "0";
@@ -78,6 +96,7 @@ namespace MulTris {
 		public bool Destroyed { get => dst; private set => dst = value; }
 
 		public void Destroy() {
+			new Debug($"TetroBlock({Tetrid}, {Destroyed})", "Destroying tblock!", Debug.Importance.IMPORTANT_INFO);
 			Destroyed = true;
 		}
 
@@ -134,15 +153,16 @@ namespace MulTris {
 					// OFFSET PIECE
 					Rectangle pos = new Rectangle(this.ScreenPosition, Size);
 					sb.Draw(sprite.Texture, pos, sprite.Source, Color.White);
-					if( centerPiece.DebugInfo )
-						sb.DrawString(m.FiraLight10, "O" + Offset.X + ":" + Offset.Y, new Vector2(pos.X + 5, pos.Y + 5), Color.White);
-					sb.DrawString(m.FiraLight10, SPS_DEBUG, new Vector2(pos.X + 5, pos.Y + 5), Color.White);
+					//if( centerPiece.DebugInfo )
+					//	sb.DrawString(m.FiraLight10, $"{GridPosition.Y}", new Vector2(pos.X + 5, pos.Y + 5), Color.White);
+					sb.DrawString(m.FiraLight10, $"{Tetrid}", new Vector2(pos.X + 5, pos.Y + 5), Color.White);
 				} else {
 					//CENTER PIECE
 					Rectangle pos = new Rectangle(this.ScreenPosition, Size);
 					sb.Draw(sprite.Texture, pos, sprite.Source, new Color(255, 255, 255) * 0.5f);
 					//if( this.DebugInfo )
-					sb.DrawString(m.FiraLight10, "R" + Rotate.ToString( ), new Vector2(pos.X + 5, pos.Y + 5), Color.Red);
+					//sb.DrawString(m.FiraLight10, $"{GridPosition.Y}", new Vector2(pos.X + 5, pos.Y + 5), Color.Red);
+					sb.DrawString(m.FiraLight10, $"{Tetrid}", new Vector2(pos.X + 5, pos.Y + 5), Color.Red);
 				}
 			}
 
