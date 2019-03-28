@@ -29,7 +29,7 @@ namespace MulTris {
 			new TetroBlock(TBT.Side, 50, "3", 3)
 		};
 
-		public void ShowTBData(){
+		public void ShowTBData() {
 			foreach( TetroBlock t in tblocks )
 				t.ShowData( );
 		}
@@ -105,25 +105,25 @@ namespace MulTris {
 				case TetroType.I:
 					switch( rotS ) {
 						case 1:
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
+							ret[0] = new Point(0, -1);
+							ret[1] = new Point(0, 1);
+							ret[2] = new Point(0, 2);
 							break;
 						case 2:
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
+							ret[0] = new Point(-1, 0);
+							ret[1] = new Point(-2, 0);
+							ret[2] = new Point(1, 0);
 							break;
 						case 3:
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
+							ret[0] = new Point(0, -2);
+							ret[1] = new Point(0, -1);
+							ret[2] = new Point(0, 1);
 							break;
 						default:
 							// 0 or 3+
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
+							ret[0] = new Point(-1, 0);
+							ret[1] = new Point(2, 0);
+							ret[2] = new Point(1, 0);
 							break;
 					}
 					break;
@@ -326,7 +326,7 @@ namespace MulTris {
 			this.Board = board;
 
 			new Debug("Tetromino#()", $"Setting proper offsets for given TetroType( { t } ) : ${ string.Join(",", rBl) }.");
-			 
+
 			this.BlockSize = board.GridSize;
 
 			tblocks[0].Init(null, 0, 0);
@@ -467,14 +467,14 @@ namespace MulTris {
 			return false;
 		}
 
-		public void DropIfNotUnder(int y){
+		public void DropIfNotUnder(int y) {
 			TetroBlock lowest = tblocks[0];
-			foreach(TetroBlock t in tblocks){
-				if(t.GridPosition.Y > lowest.GridPosition.Y){
+			foreach( TetroBlock t in tblocks ) {
+				if( t.GridPosition.Y > lowest.GridPosition.Y ) {
 					lowest = t;
 				}
 			}
-			if(lowest.GridPosition.Y < y){
+			if( lowest.GridPosition.Y < y ) {
 				CenterBlock.MoveBy(0, 1);
 			}
 		}

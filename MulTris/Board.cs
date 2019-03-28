@@ -157,8 +157,7 @@ namespace MulTris {
 					if( t.IsOnLine(y) ) {
 						t.OnLine(y).ForEach((x) => x.Destroy( ));
 						t.DropBlocksOver(y);
-					}
-					else{
+					} else {
 						t.DropIfNotUnder(y);
 					}
 				}
@@ -178,7 +177,7 @@ namespace MulTris {
 			}
 		}
 
-		private readonly List<TetroType> UsedTT = new List<TetroType> { TetroType.Z, TetroType.S };
+		private readonly List<TetroType> UsedTT = new List<TetroType> { TetroType.Z, TetroType.S, TetroType.I };
 
 		public void AddTetromino(TetroType t) {
 
@@ -206,6 +205,9 @@ namespace MulTris {
 				case TetroType.S:
 					nt.Load(blockTXT, new Rectangle(50, 0, 50, 50));
 					break;
+				case TetroType.I:
+					nt.Load(blockTXT, new Rectangle(100, 0, 50, 50));
+					break;
 				default:
 					nt.Load(this.Game.Content);
 					break;
@@ -219,6 +221,7 @@ namespace MulTris {
 			new Debug("Board#AddTetromino", "Added new Tetromino #" + tetrominoes.Count);
 		}
 
+		/* DEBUG SET YOUR RNG
 		private int rngid = 0;
 		private List<TetroType> GMN = new List<TetroType> {
 			TetroType.S,
@@ -232,13 +235,15 @@ namespace MulTris {
 			TetroType.Z,
 			TetroType.I
 		};
+		*/
 
 		public TetroType RandomTT(List<TetroType> l) {
-			/*
-				int rn = new Random(DateTime.Now.Millisecond).Next(0, l.Count * 10);
-				new Debug("Board#RandomTT", $"CAP: 0 - {l.Count * 10 - 1}. #: {rn}.", Debug.Importance.IMPORTANT_INFO);
-				return l[(int) ( rn / 10 )];
-			*/
+			// RNG
+			int rn = new Random(DateTime.Now.Millisecond).Next(0, l.Count * 10);
+			new Debug("Board#RandomTT", $"CAP: 0 - {l.Count * 10 - 1}. #: {rn}.");
+			return l[(int) ( rn / 10 )];
+
+			/* DEBUG SET YOUR RNG
 			rngid++;
 			var r = GMN[rngid];
 			if( r == TetroType.I ) {
@@ -246,12 +251,13 @@ namespace MulTris {
 				r = TetroType.S;
 			}
 			return r;
+			*/
 		}
 
 		private bool sped = false;
 
-		public void ShowAllTBData(){
-			foreach(Tetromino t in this){
+		public void ShowAllTBData() {
+			foreach( Tetromino t in this ) {
 				t.ShowTBData( );
 			}
 		}
@@ -268,16 +274,11 @@ namespace MulTris {
 				// Every second
 				new Debug("Board#FixedUpdateS", $"Fall should occur!");
 				Tetromino lastTetro = tetrominoes.Last( );
-				bool ds = false;
 				for( int i = Size.Y; i > 0; i-- ) {
 					if( CheckIfFullLine(i) ) {
 						new Debug("", $"Line {i} is full. Destroying!", Debug.Importance.IMPORTANT_INFO);
 						DestroyLine(i);
-						ds = true;
 					}
-				}
-				if( ds ) {
-					ShowAllTBData( );
 				}
 				if( !lastTetro.Fall ) {
 					AddTetromino(RandomTT(UsedTT));

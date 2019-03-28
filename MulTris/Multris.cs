@@ -27,13 +27,13 @@ namespace MulTris {
 		public Debug(string invoker, object msg, Importance importance = (Importance) 0) {
 			uint imp = (uint) importance;
 			if( imp >= (uint) MinImp )
-				Console.WriteLine($"[{importance.ToString()}]( " + invoker + " ) " + msg.ToString( ));
+				Console.WriteLine($"[{importance.ToString( )}]( " + invoker + " ) " + msg.ToString( ));
 		}
-		
+
 		public Debug(string invoker, string msg, Importance importance = (Importance) 0) {
 			uint imp = (uint) importance;
 			if( imp >= (uint) MinImp )
-				Console.WriteLine($"[{importance.ToString()}]( " + invoker + " ) " + msg);
+				Console.WriteLine($"[{importance.ToString( )}]( " + invoker + " ) " + msg);
 		}
 	}
 
@@ -50,6 +50,8 @@ namespace MulTris {
 			OPTIONS,
 			GAME
 		}
+
+		public static readonly string VERSION_STRING = "Pre-Alpha v0.2";
 
 		/* STRUCTS */
 
@@ -252,7 +254,7 @@ namespace MulTris {
 			// Start collecting .Draw(...) calls 
 			this.spriteBatch.Begin( );
 
-			//this.spriteBatch.DrawString(FiraLight20, ("G: "+this.State+" M: "+this.menu.State+" S: " + this.selectmenu.State), new Vector2(0, 0), Color.Red);
+			this.spriteBatch.DrawString(FiraLight10, $"Version: {VERSION_STRING}", new Vector2(WIDTH - FiraLight10.MeasureString("Version: Pre-Alpha v0.1").X, HEIGHT - FiraLight10.MeasureString("Version: Pre-Alpha v0.1").Y), Color.Red);
 
 			if( this.State == GameState.MENU ) {
 				// RENDER ALL MENU SPRITES
@@ -270,7 +272,7 @@ namespace MulTris {
 				// DRAW OPTIONS
 			}
 			if( this.State == GameState.GAME ) {
-				this.spriteBatch.DrawString(FiraLight10, ( $"M: {this.State} S: {tetris.board.Size.X}/{tetris.board.Size.Y}"), new Vector2(0, 0), Color.Yellow);
+				this.spriteBatch.DrawString(FiraLight10, ( $"M: {this.State} S: {tetris.board.Size.X}/{tetris.board.Size.Y}" ), new Vector2(0, 0), Color.Yellow);
 				// DRAW GAME
 				this.tetris.Draw(this.spriteBatch);
 			}

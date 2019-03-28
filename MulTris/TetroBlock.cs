@@ -153,16 +153,16 @@ namespace MulTris {
 					// OFFSET PIECE
 					Rectangle pos = new Rectangle(this.ScreenPosition, Size);
 					sb.Draw(sprite.Texture, pos, sprite.Source, Color.White);
-					//if( centerPiece.DebugInfo )
-					//	sb.DrawString(m.FiraLight10, $"{GridPosition.Y}", new Vector2(pos.X + 5, pos.Y + 5), Color.White);
-					sb.DrawString(m.FiraLight10, $"{Tetrid}", new Vector2(pos.X + 5, pos.Y + 5), Color.White);
+					if( centerPiece.DebugInfo )
+						//sb.DrawString(m.FiraLight10, $"{GridPosition.Y}", new Vector2(pos.X + 5, pos.Y + 5), Color.White);
+						sb.DrawString(m.FiraLight10, $"{Tetrid}", new Vector2(pos.X + 5, pos.Y + 5), Color.White);
 				} else {
 					//CENTER PIECE
 					Rectangle pos = new Rectangle(this.ScreenPosition, Size);
 					sb.Draw(sprite.Texture, pos, sprite.Source, new Color(255, 255, 255) * 0.5f);
-					//if( this.DebugInfo )
-					//sb.DrawString(m.FiraLight10, $"{GridPosition.Y}", new Vector2(pos.X + 5, pos.Y + 5), Color.Red);
-					sb.DrawString(m.FiraLight10, $"{Tetrid}", new Vector2(pos.X + 5, pos.Y + 5), Color.Red);
+					if( this.DebugInfo )
+						//sb.DrawString(m.FiraLight10, $"{GridPosition.Y}", new Vector2(pos.X + 5, pos.Y + 5), Color.Red);
+						sb.DrawString(m.FiraLight10, $"{Tetrid}", new Vector2(pos.X + 5, pos.Y + 5), Color.Red);
 				}
 			}
 
