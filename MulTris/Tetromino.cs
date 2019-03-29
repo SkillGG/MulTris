@@ -182,26 +182,11 @@ namespace MulTris {
 				// TODO: Rotations
 				case TetroType.O:
 					switch( rotS ) {
-						case 1:
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
-							break;
-						case 2:
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
-							break;
-						case 3:
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
-							break;
 						default:
-							// 0 or 3+
-							ret[0] = new Point( );
-							ret[1] = new Point( );
-							ret[2] = new Point( );
+							// Its a cube :/
+							ret[0] = new Point(1, 0);
+							ret[1] = new Point(1, 1);
+							ret[2] = new Point(0, 1);
 							break;
 					}
 					break;

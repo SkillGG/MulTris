@@ -104,7 +104,7 @@ namespace MulTris {
 			try {
 				this.size = new Point(bs.X, bs.Y);
 				this.tetrominoes = new List<Tetromino>( );
-				AddTetromino(TetroType.S);
+				AddTetromino(TetroType.O);
 				this.init = true;
 			} catch( System.Exception e ) {
 				this.init = false;
@@ -173,11 +173,17 @@ namespace MulTris {
 						t.ToggleDebug( );
 					}
 				}
+				for( int i = Size.Y; i > 0; i-- ) {
+					if( CheckIfFullLine(i) ) {
+						new Debug("", $"Line {i} is full. Destroying!", Debug.Importance.IMPORTANT_INFO);
+						DestroyLine(i);
+					}
+				}
 				lastTetro.Update(bef);
 			}
 		}
 
-		private readonly List<TetroType> UsedTT = new List<TetroType> { TetroType.Z, TetroType.S, TetroType.I };
+		private readonly List<TetroType> UsedTT = new List<TetroType> { TetroType.Z, TetroType.S, TetroType.I, TetroType.O };
 
 		public void AddTetromino(TetroType t) {
 
@@ -207,6 +213,9 @@ namespace MulTris {
 					break;
 				case TetroType.I:
 					nt.Load(blockTXT, new Rectangle(100, 0, 50, 50));
+					break;
+				case TetroType.O:
+					nt.Load(blockTXT, new Rectangle(150, 0, 50, 50));
 					break;
 				default:
 					nt.Load(this.Game.Content);
@@ -254,7 +263,7 @@ namespace MulTris {
 			*/
 		}
 
-		private bool sped = false;
+		private byte sped = 0;
 
 		public void ShowAllTBData() {
 			foreach( Tetromino t in this ) {
@@ -262,25 +271,22 @@ namespace MulTris {
 			}
 		}
 
+		public long tetroDropped = 0;
+
 		public void FallUpdate() {
 			if( init && load ) {
-				if( !sped ) {
-					if( tetrominoes.Count > 5 ) {
+				if( sped < 3 ) { 
+					if( (sped + tetroDropped) % 5 == 0 ) {
 						new Debug("FU", "Speed up!", Debug.Importance.IMPORTANT_INFO);
 						this.Game.tetris.SpeedUp(4);
-						sped = true;
+						sped++;
 					}
 				}
 				// Every second
 				new Debug("Board#FixedUpdateS", $"Fall should occur!");
 				Tetromino lastTetro = tetrominoes.Last( );
-				for( int i = Size.Y; i > 0; i-- ) {
-					if( CheckIfFullLine(i) ) {
-						new Debug("", $"Line {i} is full. Destroying!", Debug.Importance.IMPORTANT_INFO);
-						DestroyLine(i);
-					}
-				}
 				if( !lastTetro.Fall ) {
+					tetroDropped++;
 					AddTetromino(RandomTT(UsedTT));
 					return;
 				} else {
