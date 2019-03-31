@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+	<Product Id="*" Name="MulTrisInstaller" Language="1033" Version="0.0.0.2" Manufacturer="SkillGG" UpgradeCode="00c50260-2387-445c-bb13-2cf78ee7421e">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+		<!--
+		<MajorUpgrade DowngradeErrorMessage="Przepraszam, ale masz zainstalowaną nowszą wersje!"/>
+		-->
+		<MediaTemplate EmbedCab="yes" />
+
+		<Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Thank you for installing this product." />
+
+		<WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+
+		<UI>
+			<UIRef Id="WixUI_Minimal"/>
+			<Publish Dialog="ExitDialog"
+    Control="Finish"
+    Event="DoAction"
+    Value="OALInstall">
+			</Publish>
+		</UI>
+
+		<Property Id="WixSilentExecCmdLine" Value="start %PROGRAMFILES(X86)%\Multris\Libs\oalinst.exe" Hidden="yes" />
+		<CustomAction Id="OALInstall" BinaryKey="WixCA" DllEntry="WixSilentExec" Execute="immediate" Return="check"/>
+
+		<!-- Define the directory structure -->
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="MulTris" >
+					<Directory Id="Libraries" Name="Libs" />
+					<Directory Id="CONTENTFOLDER" Name="Content" >
+						<Directory Id="MainMenuContent" Name="MainMenu" />
+						<Directory Id="FontsContent" Name="Fonts" />
+						<Directory Id="GameContent" Name="Game" />
+					</Directory>
+				</Directory>
+			</Directory>
+		</Directory>
+
+		<!-- Define Files -->
+		<DirectoryRef Id="INSTALLFOLDER">
+			<Component Id="Exec" Guid="*">
+				<File Id="Exec" Source="$(var.MulTris.TargetPath)" />
+			</Component>
+			<Component Id='DLLS' Guid='*'>
+				<File Id='DLLS' Source='$(var.MulTris.TargetDir)\SharpDX.Direct2D1.dll'/>
+			</Component>
+			<Component Id='DLLS1' Guid='*'>
+				<File Id='DLLS1' Source='$(var.MulTris.TargetDir)\SharpDX.Direct3D11.dll'/>
+			</Component>
+			<Component Id='DLLS2' Guid='*'>
+				<File Id='DLLS2' Source='$(var.MulTris.TargetDir)\SharpDX.dll'/>
+			</Component>
+			<Component Id='DLLS3' Guid='*'>
+				<File Id='DLLS3' Source='$(var.MulTris.TargetDir)\SharpDX.DXGI.dll'/>
+			</Component>
+			<Component Id='DLLS4' Guid='*'>
+				<File Id='DLLS4' Source='$(var.MulTris.TargetDir)\SharpDX.MediaFoundation.dll'/>
+			</Component>
+			<Component Id='DLLS5' Guid='*'>
+				<File Id='DLLS5' Source='$(var.MulTris.TargetDir)\SharpDX.XAudio2.dll'/>
+			</Component>
+			<Component Id='DLLS6' Guid='*'>
+				<File Id='DLLS6' Source='$(var.MulTris.TargetDir)\SharpDX.XInput.dll'/>
+			</Component>
+			<Component Id='DLLS7' Guid='*'>
+				<File Id='DLLS7' Source='$(var.MulTris.TargetDir)\MonoGame.Framework.dll'/>
+			</Component>
+			<Component Id='PDB' Guid='*'>
+				<File Id='PDB' Source='$(var.MulTris.TargetDir)\MulTris.pdb' />
+			</Component>
+		</DirectoryRef>
+		<DirectoryRef Id='MainMenuContent'>
+			<Component Id='mainMenu' Guid='*'>
+				<File Id='mainMenu' Source='$(var.MulTris.TargetDir)\Content\MainMenu\mainMenu.xnb' />
+			</Component>
+			<Component Id='selectMenu' Guid='*'>
+				<File Id='selectMenu' Source='$(var.MulTris.TargetDir)\Content\MainMenu\selectMenu.xnb' />
+			</Component>
+		</DirectoryRef>
+		<DirectoryRef Id='FontsContent'>
+			<Component Id='fira10' Guid='*'>
+				<File Id='fira10' Source='$(var.MulTris.TargetDir)\Content\Fonts\Fira10.xnb' />
+			</Component>
+			<Component Id='fira20' Guid='*'>
+				<File Id='fira20' Source='$(var.MulTris.TargetDir)\Content\Fonts\Fira20.xnb' />
+			</Component>
+			<Component Id='fira24' Guid='*'>
+				<File Id='fira24' Source='$(var.MulTris.TargetDir)\Content\Fonts\Fira24.xnb' />
+			</Component>
+		</DirectoryRef>
+		<DirectoryRef Id='GameContent'>
+			<Component Id='Blocks' Guid='*'>
+				<File Id='Blocks' Source='$(var.MulTris.TargetDir)\Content\Game\blocks.xnb' />
+			</Component>
+			<Component Id='Board' Guid='*'>
+				<File Id='Board' Source='$(var.MulTris.TargetDir)\Content\Game\Board.xnb' />
+			</Component>
+		</DirectoryRef>
+		<DirectoryRef Id='Libraries'>
+			<Component Id='oal' Guid='*'>
+				<File Id='oal' Source='$(var.MulTris.TargetDir)oalinst.exe' />
+			</Component>
+		</DirectoryRef>
+
+		<!-- Add File to Installer -->
+		<Feature Id='MulTris' Title='MulTris Installer' Level='1'>
+			<!-- EXE -->
+			<ComponentRef Id='Exec'/>
+			<!-- Contents -->
+			<ComponentRef Id='mainMenu' />
+			<ComponentRef Id='selectMenu' />
+			<ComponentRef Id='fira10' />
+			<ComponentRef Id='fira20' />
+			<ComponentRef Id='fira24' />
+			<ComponentRef Id='Board' />
+			<ComponentRef Id='Blocks'/>
+			<!-- DLLs -->
+			<ComponentRef Id='PDB' />
+			<ComponentRef Id='DLLS' />
+			<ComponentRef Id='DLLS1' />
+			<ComponentRef Id='DLLS2' />
+			<ComponentRef Id='DLLS3' />
+			<ComponentRef Id='DLLS4' />
+			<ComponentRef Id='DLLS5' />
+			<ComponentRef Id='DLLS6' />
+			<ComponentRef Id='DLLS7' />
+			<ComponentRef Id='oal' />
+		</Feature>
+	</Product>
+</Wix>
